@@ -133,21 +133,6 @@ def get_password_hash(pw: str):
     return pwd_context.hash(pw)
 
 
-async def authenticate_user_old(username: str, password: str):
-    """Authenticate the user using the username and password.
-
-    Returns:
-        bool: status of login
-    """
-    if username not in users:
-        raise HTTPException(
-            status_code=401, detail="Incorrect username or password")
-    if users[username] != password:
-        raise HTTPException(
-            status_code=401, detail="Incorrect username or password")
-    return True
-
-
 async def authenticate_user(email: str, password: str):
     """Authenticate the user using the email and password.
 
