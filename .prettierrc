@@ -1,0 +1,13 @@
+{
+  "tabWidth": 4,
+  "bracketSpacing": true,
+  "enable": true,
+  "htmlWhitespaceSensitivity": "css",
+  "endOfLine": "lf",
+  "proseWrap": "preserve",
+  "quoteProps": "as-needed",
+  "trailingComma": "es5",
+  "useTabs": false,
+  "semi": true,
+  "printWidth": 80
+}
