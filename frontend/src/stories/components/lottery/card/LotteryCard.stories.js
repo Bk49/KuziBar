@@ -1,0 +1,1 @@
+// The lottery card in Lottery Listing page
