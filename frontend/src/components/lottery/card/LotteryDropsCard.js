@@ -1,0 +1,1 @@
+// This is for Lottery Details page showing the info of every single possible drop inside the lottery listing
