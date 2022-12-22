@@ -1,0 +1,1 @@
+// For items in "Lottery Drafts" tab

@@ -1,0 +1,1 @@
+// This is for the whole app (To be imported in App.js!)

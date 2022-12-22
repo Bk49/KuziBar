@@ -1,0 +1,1 @@
+// The button for ref will be Create New Lottery! button
