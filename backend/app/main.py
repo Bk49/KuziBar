@@ -4,10 +4,10 @@ from pydantic import BaseModel, EmailStr, Field
 
 # Database
 from bson import ObjectId
-from db import DB_handler, Customer
+from app.db import DB_handler, Customer
 
 # Authetication
-from auth import Authenticator
+from app.auth import Authenticator
 
 # logging
 import logging
@@ -91,7 +91,7 @@ async def authenticate_user(email: str, password: str):
     Returns:
         bool: status of login
     """
-    user = db_handler.user_exist(email)
+    user = db_handler.get_user(email)
     if not user:
         return False
     if not authenticator.verify_password(password, user["cust_password"]):

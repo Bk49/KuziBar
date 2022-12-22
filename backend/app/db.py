@@ -28,6 +28,10 @@ class DB_handler:
     def add_user(self, user: dict):
         """Insert a new user."""
         self.db.users.insert_one(user)
+    
+    def get_user(self, email: str):
+        """Get the user."""
+        return self.db.users.find_one({'cust_email': email})
 
     def get_all_user(self):
         """Read all user."""
