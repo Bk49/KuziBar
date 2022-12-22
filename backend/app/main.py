@@ -1,24 +1,26 @@
 # API related packages
 from fastapi import FastAPI, Query, HTTPException, Depends, status
 from pydantic import BaseModel, EmailStr, Field
+from datetime import timedelta
 
 # Database
 from bson import ObjectId
 from app.db import DB_handler, Customer
 
 # Authetication
-from app.auth import Authenticator
+from fastapi.security import OAuth2PasswordRequestForm
+from app.auth import Authenticator, Token
 
 # logging
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("uvicorn.error")
 
-
 # variables
 newuser = Customer()
 db_handler = DB_handler()
 authenticator = Authenticator()
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
 class User(BaseModel):
@@ -45,7 +47,7 @@ async def login(email: str = Query(..., description="The email of the user"),
     Returns:
         HTTPresponse: API response message
     """
-    user = await authenticate_user(email, password)
+    user = await authenticator.authenticate_user(email, password)
     if user:
         return {"message": "Login successful"}
     else:
@@ -84,19 +86,27 @@ def read_users():
     documents = db_handler.get_all_user()
     return {"messsage": str(documents)}
 
-
-async def authenticate_user(email: str, password: str):
-    """Authenticate the user using the email and password.
-
-    Returns:
-        bool: status of login
-    """
-    user = db_handler.get_user(email)
+@app.post("/token", response_model=Token)
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    """Login for access token."""
+    user = authenticator.authenticate_user(form_data.username, form_data.password)
+    logger.info(f"LOOK HEREEEEE {str(user)}")
     if not user:
-        return False
-    if not authenticator.verify_password(password, user["cust_password"]):
-        return False
-    return user
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = authenticator.create_access_token(
+        data={"sub": user["cust_email"]}, expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@app.get("/users/me/", response_model=User)
+async def read_users_me(current_user: str = Depends(authenticator.get_current_user)):
+    """Get user own credentials."""
+    return User(name=current_user['cust_name'], email=current_user['cust_email'], password=current_user['cust_password'])
 
 
 def create_user(email, username, password):
