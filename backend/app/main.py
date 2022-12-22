@@ -26,10 +26,9 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 client = MongoClient(settings.mongodb_uri, settings.port)
 db = client.testingdata
 
-# user class on MongoDB
-
 
 class Customer(Model):
+    """User class on MongoDB."""
     cust_id = ObjectId()
     cust_email = EmailType(required=True)
     cust_name = StringType(required=True)
@@ -39,20 +38,18 @@ class Customer(Model):
 # an instance of User
 newuser = Customer()
 
-# function to create user
-
 
 def create_user(email, username, password):
-    newuser.custid = ObjectId()
+    """Create new user."""
+    newuser.cust_id = ObjectId()
     newuser.cust_email = email
     newuser.cust_name = username
     newuser.cust_password = password
     return dict(newuser)
 
-# user class on fastAPI
-
 
 class User(BaseModel):
+    """User class on FastAPI."""
     name: str = Field(..., min_length=3, max_length=50)
     email: EmailStr = Field(...)
     password: str = Field(..., min_length=8)
@@ -80,7 +77,7 @@ async def login(email: str = Query(..., description="The email of the user"),
         return {"message": "Login successful"}
     else:
         raise HTTPException(
-            status_code=400, detail="Incorrect username or password")
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect username or password")
 
 
 @app.post("/signup/")
@@ -102,7 +99,8 @@ def add_user(user: User):
     # check if email exist already
     if db.users.find_one({'cust_email': data['cust_email']}) is not None:
         user_exist = True
-        raise HTTPException(status_code=400, detail="Customer exists")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Customer exists")
     elif user_exist == False:
         db.users.insert_one(data)
         return {"message": "User created", "email": data['cust_email'], "name": data['cust_name']}
