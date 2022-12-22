@@ -2,50 +2,23 @@
 from fastapi import FastAPI, Query, HTTPException, Depends, status
 from pydantic import BaseModel, EmailStr, Field
 
-# MongoDB related packages
+# Database
 from bson import ObjectId
-from schematics.models import Model
-from schematics.types import StringType, EmailType
-from pymongo import MongoClient
+from db import DB_handler, Customer
 
-# autehntication library
-from passlib.context import CryptContext
+# Authetication
+from auth import Authenticator
 
-# logging library
+# logging
 import logging
-import app.settings as settings
-
-# logging handler
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("uvicorn.error")
 
-#  password handler
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# mongoDB instance
-client = MongoClient(settings.mongodb_uri, settings.port)
-db = client.testingdata
-
-
-class Customer(Model):
-    """User class on MongoDB."""
-    cust_id = ObjectId()
-    cust_email = EmailType(required=True)
-    cust_name = StringType(required=True)
-    cust_password = StringType(required=True)
-
-
-# an instance of User
+# variables
 newuser = Customer()
-
-
-def create_user(email, username, password):
-    """Create new user."""
-    newuser.cust_id = ObjectId()
-    newuser.cust_email = email
-    newuser.cust_name = username
-    newuser.cust_password = password
-    return dict(newuser)
+db_handler = DB_handler()
+authenticator = Authenticator()
 
 
 class User(BaseModel):
@@ -55,7 +28,7 @@ class User(BaseModel):
     password: str = Field(..., min_length=8)
 
 
-# init fasrAPI
+# init FastAPI
 app = FastAPI()
 
 
@@ -93,42 +66,23 @@ def add_user(user: User):
     Returns:
         HTTPResponse: user created with corresponding details
     """
-    user_exist = False
-    data = create_user(user.email, user.name, get_password_hash(user.password))
+    new_user = create_user(user.email, user.name,
+                           authenticator.get_password_hash(user.password))
 
     # check if email exist already
-    if db.users.find_one({'cust_email': data['cust_email']}) is not None:
-        user_exist = True
+    if db_handler.user_exist(new_user['cust_email']):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Customer exists")
-    elif user_exist == False:
-        db.users.insert_one(data)
-        return {"message": "User created", "email": data['cust_email'], "name": data['cust_name']}
+    else:
+        db_handler.add_user(new_user)
+        return {"message": "User created", "email": new_user['cust_email'], "name": new_user['cust_name']}
 
 
 @app.get("/all_users/")
 def read_users():
     """Read all users."""
-    documents = get_all_documents()
+    documents = db_handler.get_all_user()
     return {"messsage": str(documents)}
-
-
-def get_all_documents():
-    """Helper function to read all user."""
-    list_of_users = []
-    for user in db.users.find():
-        list_of_users.append(user)
-    return list_of_users
-
-
-def verify_password(plain_pw: str, hashed_pw: str):
-    """Verify password."""
-    return pwd_context.verify(plain_pw, hashed_pw)
-
-
-def get_password_hash(pw: str):
-    """Get hashed password."""
-    return pwd_context.hash(pw)
 
 
 async def authenticate_user(email: str, password: str):
@@ -137,9 +91,18 @@ async def authenticate_user(email: str, password: str):
     Returns:
         bool: status of login
     """
-    user = db.users.find_one({'cust_email': email})
+    user = db_handler.user_exist(email)
     if not user:
         return False
-    if not verify_password(password, user["cust_password"]):
+    if not authenticator.verify_password(password, user["cust_password"]):
         return False
     return user
+
+
+def create_user(email, username, password):
+    """Create new user."""
+    newuser.cust_id = ObjectId()
+    newuser.cust_email = email
+    newuser.cust_name = username
+    newuser.cust_password = password
+    return dict(newuser)
