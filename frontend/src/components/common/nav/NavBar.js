@@ -49,7 +49,7 @@ const NavBar = ({ currentPage }) => {
                         />
                     </div>
                     <div className="button-container">
-                        <TextButton text="Login" color="#F77F00" />
+                        <TextButton onClick={() => navigate("/login")} text="Login" color="#F77F00" />
                     </div>
                 </div>
             </div>
