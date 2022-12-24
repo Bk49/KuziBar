@@ -1,11 +1,13 @@
 // import {} from 'react'
+import NavBar from "../../../components/common/nav/NavBar";
 
 const AddItemPage = () => {
     return (
-        <h1>
-            This is Add Item Page!
-        </h1>
-    )
-}
+        <>
+            <NavBar />
+            <h1>This is Add Item Page!</h1>
+        </>
+    );
+};
 
-export default AddItemPage
+export default AddItemPage;

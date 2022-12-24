@@ -1,0 +1,62 @@
+.nav-container {
+    display: flex;
+    background-color: #ffeccf;
+    width: 100%;
+    height: 70px;
+}
+
+.nav-elements-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+    align-items: center;
+}
+
+.nav-item-container {
+    margin-right: 2%;
+    height: 66%;
+    padding: 0 1.8rem;
+    display: flex;
+    align-items: center;
+    vertical-align: middle;
+    border-radius: 50px;
+}
+
+.nav-item-active, .nav-item-container:hover {
+    background: linear-gradient(to bottom right, #f12711 0%, #f5af19 100%);
+    color: white;
+    cursor: pointer;
+}
+
+.app-logo {
+    max-height: 100%;
+    max-width: 100%;
+    vertical-align: top;
+    display: inline-block;
+}
+
+.nav-text {
+    display: inline-block;
+    font-family: Poppins;
+    margin-left: 10px;
+    font-size: 1rem;
+}
+
+.nav-icon {
+    height: 1.8rem;
+}
+
+.nav-icon-active g, .nav-item-container:hover > .nav-icon g {
+    fill: white;
+}
+
+.right-container {
+    margin-right: 0;
+    margin-left: auto;
+}
+
+.button-container {
+    display: inline-block;
+    margin-right: 1vw;
+}
