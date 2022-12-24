@@ -1,19 +1,9 @@
-from bson import ObjectId
-from schematics.models import Model
-from schematics.types import StringType, EmailType
 from pymongo import MongoClient
+from app.schemas import Customer
 
 # MongoDB attributes
 MONGODB_URL = "mongodb+srv://yungxin:yungxinpassword@mochi.j3njxdv.mongodb.net/mochi?retryWrites=true&w=majority"
 PORT = 80
-
-
-class Customer(Model):
-    """User class on MongoDB."""
-    cust_id = ObjectId()
-    cust_email = EmailType(required=True)
-    cust_name = StringType(required=True)
-    cust_password = StringType(required=True)
 
 
 class DB_handler:
@@ -28,7 +18,7 @@ class DB_handler:
     def add_user(self, user: dict):
         """Insert a new user."""
         self.db.users.insert_one(user)
-    
+
     def get_user(self, email: str):
         """Get the user."""
         return self.db.users.find_one({'cust_email': email})
@@ -39,3 +29,12 @@ class DB_handler:
         for user in self.db.users.find():
             list_of_users.append(user)
         return list_of_users
+
+    def add_blacklist_token(self, token):
+        """Insert a blacklisted token."""
+        self.db.blacklist_token.insert_one({"token": token})
+        return True
+
+    def is_token_blacklisted(self, token):
+        """Validate if token is blacklisted."""
+        return self.db.blacklist_token.find_one({'token': token}) is not None
