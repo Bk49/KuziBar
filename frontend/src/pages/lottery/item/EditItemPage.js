@@ -1,11 +1,13 @@
 // import {} from 'react'
+import NavBar from "../../../components/common/nav/NavBar";
 
 const EditItemPage = () => {
     return (
-        <h1>
-            This is Edit Item Page!
-        </h1>
-    )
-}
+        <>
+            <NavBar />
+            <h1>This is Edit Item Page!</h1>
+        </>
+    );
+};
 
-export default EditItemPage
+export default EditItemPage;

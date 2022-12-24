@@ -1,11 +1,14 @@
 // import {} from 'react'
 
+import NavBar from "../../components/common/nav/NavBar";
+
 const LotteryListingPage = () => {
     return (
-        <h1>
-            This is Lottery Listing Page!
-        </h1>
-    )
-}
+        <>
+            <NavBar currentPage="lottery" />
+            <h1>This is Lottery Listing Page!</h1>
+        </>
+    );
+};
 
-export default LotteryListingPage
+export default LotteryListingPage;
