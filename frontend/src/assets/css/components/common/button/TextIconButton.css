@@ -1,0 +1,35 @@
+.button2:active {
+    transform: translateY(4px);
+    box-shadow: none;
+}
+
+.button2 {
+    display: flex;
+    padding: 0.5rem 1.4rem;
+    align-items: center;
+    border: none;
+    border-radius: 7px;
+    box-shadow: 0px 4px 0px rgba(0, 0, 0, 0.28);
+    background: linear-gradient(
+        to right,
+        #003049 0%,
+        #d62828 25%,
+        #f77f00 50%,
+        #fcbf49 75%,
+        #eae2b7 100%
+    );
+}
+
+.button2-text {
+    color: white;
+    font-family: Poppins;
+    font-weight: 700;
+    font-size: 1.4rem;
+    text-align: center;
+}
+
+.button2-icon {
+    margin-left: 20px;
+    height: 2rem;
+    align-self: center;
+}
