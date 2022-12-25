@@ -130,6 +130,6 @@ class Authenticator:
         user = db_handler.get_user(email)
         if not user:
             return False
-        if not self.verify_password(password, user["cust_password"]):
+        if not self.verify_password(password, user["user_password"]):
             return False
         return user
