@@ -14,11 +14,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from app.auth import Authenticator
 
 # logging
-import logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("uvicorn.error")
-
-# import routers
+from app.log import logger
 
 # variables
 user_db_handler = User_DB_handler()

@@ -35,6 +35,7 @@ class NewUser(BaseModel):
     user_name: str = Field(..., min_length=1, max_length=50)
     user_email: EmailStr = Field(...)
     user_password: str = Field(..., min_length=1)
+    user_pp: Union[str, None] = None
 
 
 class User(BaseModel):
@@ -42,6 +43,7 @@ class User(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     user_name: str = Field(..., min_length=1, max_length=50)
     user_email: EmailStr = Field(...)
+    user_pp: Union[str, None] = None
 
     class Config:
         allow_population_by_field_name = True
@@ -68,8 +70,17 @@ class NewItem(BaseModel):
     tier: int = Field(...)
     drop_rate: float = Field(...)
     skins: Union[List[Skin], None] = []
-    lottery_id: PyObjectId = Field(
-        default_factory=PyObjectId, alias="lottery_id")
+    lottery_id: str = Field(...)
+
+
+class SimpleItem(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    item_image: str
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
 
 
 class Item(NewItem):
@@ -108,11 +119,8 @@ class NewLottery(BaseModel):
     cover_image: str = Field(...)
     date_created: Union[datetime.date, None] = None
     prize_per_pull: int = Field(...)
-    creator_id: PyObjectId = Field(default_factory=PyObjectId, alias="creator_id")
-    # creator_name: str = Field(...)
-    # creator_prof_pic: str = Field(...)
+    creator_id: str = Field(...)
     remaining_tickets: int = Field(...)
-    # possible_drops: Union[List[Item], None] = []
     status: int = Field(..., ge=0, le=1)
     items: Union[List[NewItem], None] = []
 
@@ -124,32 +132,11 @@ class NewLottery(BaseModel):
 
 class Lottery(NewLottery):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    possible_drops: Union[List[Item], None] = []
+    possible_drops: Union[List[SimpleItem], None] = []
+    creator_name: str = None
+    creator_prof_pic: str = None
 
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
-        schema_extra = {
-            "example": {
-                "_id": "1234567890",
-                "lottery_name": "example",
-                "cover_image": "cover_img_URL",
-                "date_created": "2008-09-15",
-                "prize_per_pull": 10,
-                "creator_id": "0987654321",
-                "creator_name": "example2",
-                "creator_prof_pic": "creator_img_URL",
-                "remaining_tickets": 10,
-                "possible_drops": [
-                    {
-                        "item_id": "12345",
-                        "item_pic": "item_URL"
-                    },
-                    {
-                        "item_id": "123456",
-                        "item_pic": "item_URL2"
-                    }
-                ]
-            }
-        }
