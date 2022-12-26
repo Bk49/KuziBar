@@ -22,7 +22,7 @@ const ImageInput = ({ image, setImage, name }) => {
                             <br />
                             <Button
                                 primary
-                                onClick={() => fileInputRef.current.focus()}
+                                onClick={() => fileInputRef.current.click()}
                             >
                                 Change Image
                             </Button>

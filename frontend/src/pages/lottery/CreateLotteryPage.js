@@ -1,5 +1,3 @@
-// import {} from 'react'
-
 import NavBar from "../../components/common/nav/NavBar";
 import Heading1 from "../../components/common/header/Heading1";
 import Heading2 from "../../components/common/header/Heading2";
@@ -9,7 +7,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { setLotteryVal } from "../../redux/slice/lotterySlice";
 import { Form, Grid } from "semantic-ui-react";
 import { useNavigate } from "react-router";
-// import { useEffect } from "react";
 
 const CreateLotteryPage = () => {
     const lotteryObj = useSelector((state) => state.lottery);
