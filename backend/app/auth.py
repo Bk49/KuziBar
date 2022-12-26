@@ -5,7 +5,8 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from fastapi import Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordBearer
-from app.db import DB_handler
+from .databases.token_db import Token_DB_handler
+from .databases.user_db import User_DB_handler
 from app.schemas import TokenData
 
 # Constants
@@ -15,7 +16,8 @@ REFRESH_TOKEN_SECRET_KEY = "1562a01a1f4d4ff049643ca43a4ecfbfdc71f3fdea167b8543c2
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 REFRESH_TOKEN_EXPIRE_MINUTES = 6000
-db_handler = DB_handler()
+token_db_handler = Token_DB_handler()
+user_db_handler = User_DB_handler()
 
 
 class Authenticator:
@@ -63,7 +65,7 @@ class Authenticator:
         )
 
         # check if token is blacklisted
-        if db_handler.is_token_blacklisted(token):
+        if token_db_handler.is_token_blacklisted(token):
             raise credentials_exception
 
         # decode token and obtain user data
@@ -78,7 +80,7 @@ class Authenticator:
             raise credentials_exception
 
         # retrieve user from db
-        user = db_handler.get_user(token_data.email)
+        user = user_db_handler.get_user(token_data.email)
         if not user:
             raise credentials_exception
 
@@ -94,7 +96,7 @@ class Authenticator:
         )
 
         # check if token is blacklisted
-        if db_handler.is_token_blacklisted(refresh_token):
+        if token_db_handler.is_token_blacklisted(refresh_token):
             raise credentials_exception
 
         # decode token and obtain user data
@@ -110,7 +112,7 @@ class Authenticator:
             raise credentials_exception
 
         # validate if user exist
-        if not db_handler.user_exist(token_data.email):
+        if not user_db_handler.user_exist(token_data.email):
             raise credentials_exception
 
         # regenerate and return new access token
@@ -127,7 +129,7 @@ class Authenticator:
         Returns:
             bool: status of login
         """
-        user = db_handler.get_user(email)
+        user = user_db_handler.get_user(email)
         if not user:
             return False
         if not self.verify_password(password, user["user_password"]):
