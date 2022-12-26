@@ -1,8 +1,9 @@
 import { Form, Input } from "semantic-ui-react";
 
-const TextInput = ({ children, placeholder, type, value, onChange, name }) => {
+const TextInput = ({ children, width, placeholder, type, value, onChange, name }) => {
     return (
         <Form.Field
+            width={width}
             name={name}
             type={type ? type : ""}
             control={Input}
