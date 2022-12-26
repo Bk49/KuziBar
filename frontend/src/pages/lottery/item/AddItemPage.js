@@ -1,11 +1,261 @@
-// import {} from 'react'
+import { useDispatch, useSelector } from "react-redux";
+import { Button, Divider, Form, Grid } from "semantic-ui-react";
+import Heading1 from "../../../components/common/header/Heading1";
+import Heading2 from "../../../components/common/header/Heading2";
+import ImageInput from "../../../components/common/input/ImageInput";
+import TextInput from "../../../components/common/input/TextInput";
 import NavBar from "../../../components/common/nav/NavBar";
+import {
+    addSkin,
+    removeSkin,
+    reset,
+    setItemVal,
+    setSkinVal,
+} from "../../../redux/slice/itemSlice";
+import { Header } from "semantic-ui-react";
+import TextButton from "../../../components/common/button/TextButton";
+import { useState } from "react";
+import ConfirmationModal from "../../../components/common/modal/ConfirmationModal";
+import { useNavigate } from "react-router";
+import { addLotteryItem } from "../../../redux/slice/lotterySlice";
 
 const AddItemPage = () => {
+    const itemState = useSelector((state) => state.item);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const [open, setOpen] = useState(false);
+
     return (
         <>
             <NavBar />
-            <h1>This is Add Item Page!</h1>
+            <div className="body">
+                <div classname="add-item-container">
+                    <Heading1>Add Item</Heading1>
+                    <Grid>
+                        <Grid.Row columns={2}>
+                            <Grid.Column width={4}>
+                                <ImageInput
+                                    name="Base Item Image"
+                                    image={itemState.image}
+                                    setImage={(img) => {
+                                        dispatch(
+                                            setItemVal({
+                                                key: "image",
+                                                value: img,
+                                            })
+                                        );
+                                    }}
+                                />
+                            </Grid.Column>
+                            <Grid.Column width={11}>
+                                <Form>
+                                    <Form.Group>
+                                        <TextInput
+                                            width={9}
+                                            placeholder="4D Ticket"
+                                            value={itemState.item_name}
+                                            onChange={(e, { value }) =>
+                                                dispatch(
+                                                    setItemVal({
+                                                        key: "item_name",
+                                                        value: value,
+                                                    })
+                                                )
+                                            }
+                                        >
+                                            Item Name
+                                        </TextInput>
+                                        <TextInput
+                                            width={3}
+                                            placeholder={2}
+                                            type="number"
+                                            value={itemState.tier}
+                                            onChange={(e, { value }) =>
+                                                dispatch(
+                                                    setItemVal({
+                                                        key: "tier",
+                                                        value: value,
+                                                    })
+                                                )
+                                            }
+                                        >
+                                            Tier
+                                        </TextInput>
+                                    </Form.Group>
+                                </Form>
+                                <p>
+                                    Tier Drop Rates:
+                                    <ul>
+                                        <li>Tier 1 (Red): 5%</li>
+                                        <li> Tier 2 (Orange): 8%</li>
+                                        <li>Tier 3 (Yellow): 12%</li>
+                                        <li>Tier 4 (Purple): 15%</li>
+                                        <li>Tier 5 (Blue): 18%</li>
+                                        <li> Tier 6 (Green): 20%</li>
+                                        <li> Tier 7(Grey): 22%</li>
+                                    </ul>
+                                    If there are multiple items in the same
+                                    tier, the drop rates will be evenly spread
+                                    among the items
+                                </p>
+                            </Grid.Column>
+                        </Grid.Row>
+                    </Grid>
+                    <br />
+                    <br />
+                    <br />
+                </div>
+                <div className="add-skins-container">
+                    <Heading2
+                        button={{
+                            text: "Add New Skin",
+                            color: "blue",
+                            onClick: () => dispatch(addSkin()),
+                        }}
+                    >
+                        Skins
+                    </Heading2>
+                    {itemState.skins.length > 0 ? (
+                        itemState.skins.map((skin, index) => (
+                            <div style={{ marginBottom: "50px" }}>
+                                <Header size="medium">Skin {index + 1}</Header>
+                                <Grid>
+                                    <Grid.Row columns={2}>
+                                        <Grid.Column width={4}>
+                                            <ImageInput
+                                                name={`Skin ${index + 1} Image`}
+                                                image={
+                                                    itemState.skins[index]
+                                                        .skin_image
+                                                }
+                                                setImage={(img) => {
+                                                    dispatch(
+                                                        setSkinVal({
+                                                            key: "skin_image",
+                                                            value: img,
+                                                            index: index,
+                                                        })
+                                                    );
+                                                }}
+                                            />
+                                        </Grid.Column>
+                                        <Grid.Column>
+                                            <Form style={{ height: "100%" }}>
+                                                <Form.Group
+                                                    style={{
+                                                        height: "100%",
+                                                        display: "flex",
+                                                        flexDirection: "column",
+                                                        justifyContent:
+                                                            "center",
+                                                    }}
+                                                >
+                                                    <TextInput
+                                                        width={9}
+                                                        value={
+                                                            itemState.skins[
+                                                                index
+                                                            ].skin_name
+                                                        }
+                                                        placeholder={`4D Ticket Type ${
+                                                            index + 1
+                                                        }`}
+                                                        onChange={(
+                                                            e,
+                                                            { value }
+                                                        ) =>
+                                                            dispatch(
+                                                                setSkinVal({
+                                                                    index: index,
+                                                                    key: "skin_name",
+                                                                    value: value,
+                                                                })
+                                                            )
+                                                        }
+                                                    >
+                                                        Skin Name
+                                                    </TextInput>
+                                                    <br />
+                                                    <div>
+                                                        <Button
+                                                            color="red"
+                                                            onClick={() =>
+                                                                dispatch(
+                                                                    removeSkin({
+                                                                        index: index,
+                                                                    })
+                                                                )
+                                                            }
+                                                        >
+                                                            Delete Skin
+                                                        </Button>
+                                                    </div>
+                                                </Form.Group>
+                                            </Form>
+                                        </Grid.Column>
+                                    </Grid.Row>
+                                </Grid>
+                            </div>
+                        ))
+                    ) : (
+                        <>
+                            <Header size="medium">
+                                There are no skins for this item
+                            </Header>
+                            <br />
+                        </>
+                    )}
+                </div>
+                <Divider />
+                <br />
+                <br />
+                <div style={{ display: "flex", flexDirection: "row-reverse" }}>
+                    <TextButton
+                        color="#F77F00"
+                        text="Save Item"
+                        onClick={() => {
+                            dispatch(addLotteryItem());
+                            dispatch(reset())
+                            navigate("/create-lottery");
+                        }}
+                    />
+                    <div style={{ marginRight: "15px" }}></div>
+                    <TextButton
+                        color="#D62828"
+                        text="Cancel"
+                        onClick={() => setOpen(true)}
+                    />
+                </div>
+            </div>
+            <ConfirmationModal
+                open={open}
+                icon="delete"
+                title="Discard Changes"
+                buttons={[
+                    <Button
+                        basic
+                        color="red"
+                        inverted
+                        onClick={() => {
+                            setOpen(false);
+                            dispatch(reset());
+                            navigate("/create-lottery");
+                        }}
+                    >
+                        Discard Changes
+                    </Button>,
+                    <Button
+                        basic
+                        color="green"
+                        inverted
+                        onClick={() => setOpen(false)}
+                    >
+                        Continue Edit
+                    </Button>,
+                ]}
+            >
+                Are you sure your would like to discard all changes?
+            </ConfirmationModal>
         </>
     );
 };
