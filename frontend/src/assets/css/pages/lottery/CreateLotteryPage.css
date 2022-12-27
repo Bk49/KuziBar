@@ -1,0 +1,23 @@
+.create-lottery-item-image-preview {
+    aspect-ratio: 1/1;
+    object-fit: cover;
+}
+
+.create-lottery-item-card-content-container {
+    padding: 1rem 1rem 1rem 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.create-lottery-item-header-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.create-lottery-item-delete-icon-container {
+    display: flex;
+    flex-direction: row-reverse;
+}

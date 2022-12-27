@@ -4,7 +4,7 @@ export const itemSlice = createSlice({
     name: "item",
     initialState: {
         item_name: "",
-        tier: 1,
+        tier: "1",
         image: "",
         skins: [],
     },
