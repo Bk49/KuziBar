@@ -1,11 +1,17 @@
 // import {} from 'react'
 import NavBar from "../../components/common/nav/NavBar";
+import TabBar from "../../components/inventory/nav/TabBar";
+import { useState } from "react";
 
 const InventoryPage = () => {
+    const [current, setCurrent] = useState(0)
+
     return (
         <>
             <NavBar currentPage="inventory" />
-            <h1>This is Inventory Page!</h1>
+            <div className="body">
+                <TabBar current={current} setCurrent={setCurrent} />
+            </div>
         </>
     );
 };
