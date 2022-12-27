@@ -47,18 +47,7 @@ async def read_lotteries():
     lotteries = lottery_db_handler.get_all()
 
     for lottery in lotteries:
-        # add possible drops
-        possible_drops = []
-        for i in range(3):
-            drop = item_db_handler.get_item_by_tier(lottery['_id'], i+1)
-            if drop is not None:
-                possible_drops.append(drop)
-        lottery['possible_drops'] = possible_drops
-
-        # add creator name and pp
-        user = user_db_handler.get_one(ObjectId(lottery['creator_id']))
-        lottery['creator_name'] = user['user_name']
-        lottery['creator_prof_pic'] = user['user_pp']
+        lottery = postprocess_lottery(lottery)
 
     return lotteries
 
@@ -66,6 +55,7 @@ async def read_lotteries():
 @router.get("/{id}", response_description="Get a single lottery", response_model=Lottery)
 async def read_lottery(id: str):
     if (lottery := lottery_db_handler.get_one(ObjectId(id))) is not None:
+        lottery = postprocess_lottery(lottery)
         return lottery
 
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
@@ -80,3 +70,19 @@ async def read_lottery(id: str):
     items = item_db_handler.get_lottery_items(id)
 
     return items
+
+def postprocess_lottery(lottery):
+    """Post process lottery document returned from database to include more info."""
+    possible_drops = []
+    for i in range(3):
+        drop = item_db_handler.get_item_by_tier(str(lottery['_id']), i+1)
+        if drop is not None:
+            possible_drops.append(drop)
+    lottery['possible_drops'] = possible_drops
+
+    # add creator name and pp
+    user = user_db_handler.get_one(ObjectId(lottery['creator_id']))
+    lottery['creator_name'] = user['user_name']
+    lottery['creator_prof_pic'] = user['user_pp']
+
+    return lottery
