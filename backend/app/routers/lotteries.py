@@ -4,7 +4,7 @@ from ..databases.lottery_db import Lottery_DB_handler
 from ..databases.item_db import Item_DB_handler 
 from ..databases.user_db import User_DB_handler
 from ..log import logger
-from ..schemas import Lottery, NewLottery, Item
+from ..schemas import Lottery, NewLottery, LotteryItem
 from typing import List
 from fastapi.encoders import jsonable_encoder
 from bson import ObjectId
@@ -61,7 +61,7 @@ async def read_lottery(id: str):
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                         detail=f"Lottery {id} not found")
 
-@router.get("/{id}/items", response_description="Get the items of a lottery", response_model=List[Item])
+@router.get("/{id}/items", response_description="Get the items of a lottery", response_model=List[LotteryItem])
 async def read_lottery(id: str):
     if (lottery := lottery_db_handler.get_one(ObjectId(id))) is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,

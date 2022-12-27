@@ -64,12 +64,15 @@ class Skin(BaseModel):
     skin_image: str = Field(...)
 
 
-class NewItem(BaseModel):
+class LotteryItem(BaseModel):
     item_name: str = Field(...)
     item_image: str = Field(...)
     tier: int = Field(...)
     drop_rate: float = Field(...)
     skins: Union[List[Skin], None] = []
+
+
+class NewItem(LotteryItem):
     lottery_id: str = Field(...)
 
 
