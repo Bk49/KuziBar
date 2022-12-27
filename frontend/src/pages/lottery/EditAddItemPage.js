@@ -1,25 +1,25 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Divider, Form, Grid } from "semantic-ui-react";
-import Heading1 from "../../../components/common/header/Heading1";
-import Heading2 from "../../../components/common/header/Heading2";
-import ImageInput from "../../../components/common/input/ImageInput";
-import TextInput from "../../../components/common/input/TextInput";
-import NavBar from "../../../components/common/nav/NavBar";
+import Heading1 from "../../components/common/header/Heading1";
+import Heading2 from "../../components/common/header/Heading2";
+import ImageInput from "../../components/common/input/ImageInput";
+import TextInput from "../../components/common/input/TextInput";
+import NavBar from "../../components/common/nav/NavBar";
 import {
     addSkin,
     removeSkin,
     reset,
     setItemVal,
     setSkinVal,
-} from "../../../redux/slice/itemSlice";
+} from "../../redux/slice/itemSlice";
 import { Header } from "semantic-ui-react";
-import TextButton from "../../../components/common/button/TextButton";
+import TextButton from "../../components/common/button/TextButton";
 import { useState } from "react";
-import ConfirmationModal from "../../../components/common/modal/ConfirmationModal";
+import ConfirmationModal from "../../components/common/modal/ConfirmationModal";
 import { useNavigate } from "react-router";
-import { addLotteryItem } from "../../../redux/slice/lotterySlice";
+import { addLotteryItem, editLotteryItem } from "../../redux/slice/lotterySlice";
 
-const AddItemPage = () => {
+const EditAddItemPage = ({ edit }) => {
     const itemState = useSelector((state) => state.item);
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -30,7 +30,7 @@ const AddItemPage = () => {
             <NavBar />
             <div className="body">
                 <div className="add-item-container">
-                    <Heading1>Add Item</Heading1>
+                    <Heading1>{edit ? "Edit Item" : "Add Item"}</Heading1>
                     <Grid>
                         <Grid.Row columns={2}>
                             <Grid.Column width={4}>
@@ -214,9 +214,12 @@ const AddItemPage = () => {
                 <div style={{ display: "flex", flexDirection: "row-reverse" }}>
                     <TextButton
                         color="#F77F00"
-                        text="Save Item"
+                        text={`Save ${edit ? "Changes" : "Item"}`}
                         onClick={() => {
-                            dispatch(addLotteryItem(itemState));
+                            if (edit)
+                                dispatch(editLotteryItem(itemState))
+                            else
+                                dispatch(addLotteryItem(itemState));
                             dispatch(reset());
                             navigate("/create-lottery");
                         }}
@@ -264,4 +267,4 @@ const AddItemPage = () => {
     );
 };
 
-export default AddItemPage;
+export default EditAddItemPage;

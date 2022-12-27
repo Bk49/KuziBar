@@ -13,6 +13,8 @@ export const itemSlice = createSlice({
             currentState[payload.key] = payload.value;
         },
 
+        setItem: (currentState, { payload }) => payload,
+
         addSkin: (currentState) => {
             currentState.skins.push({
                 skin_name: "",
@@ -30,14 +32,14 @@ export const itemSlice = createSlice({
 
         reset: (currentState) => ({
             item_name: "",
-            tier: 1,
+            tier: "1",
             image: "",
             skins: [],
         }),
     },
 });
 
-export const { setItemVal, addSkin, removeSkin, setSkinVal, reset } =
+export const { setItemVal, setItem, addSkin, removeSkin, setSkinVal, reset } =
     itemSlice.actions;
 
 export default itemSlice.reducer;
