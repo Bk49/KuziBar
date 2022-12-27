@@ -29,7 +29,7 @@ const AddItemPage = () => {
         <>
             <NavBar />
             <div className="body">
-                <div classname="add-item-container">
+                <div className="add-item-container">
                     <Heading1>Add Item</Heading1>
                     <Grid>
                         <Grid.Row columns={2}>
@@ -83,17 +83,17 @@ const AddItemPage = () => {
                                         </TextInput>
                                     </Form.Group>
                                 </Form>
+                                <span>Tier Drop Rates:</span>
+                                <ul>
+                                    <li>Tier 1 (Red): 5%</li>
+                                    <li> Tier 2 (Orange): 8%</li>
+                                    <li>Tier 3 (Yellow): 12%</li>
+                                    <li>Tier 4 (Purple): 15%</li>
+                                    <li>Tier 5 (Blue): 18%</li>
+                                    <li> Tier 6 (Green): 20%</li>
+                                    <li> Tier 7(Grey): 22%</li>
+                                </ul>
                                 <p>
-                                    Tier Drop Rates:
-                                    <ul>
-                                        <li>Tier 1 (Red): 5%</li>
-                                        <li> Tier 2 (Orange): 8%</li>
-                                        <li>Tier 3 (Yellow): 12%</li>
-                                        <li>Tier 4 (Purple): 15%</li>
-                                        <li>Tier 5 (Blue): 18%</li>
-                                        <li> Tier 6 (Green): 20%</li>
-                                        <li> Tier 7(Grey): 22%</li>
-                                    </ul>
                                     If there are multiple items in the same
                                     tier, the drop rates will be evenly spread
                                     among the items
@@ -110,14 +110,16 @@ const AddItemPage = () => {
                         button={{
                             text: "Add New Skin",
                             color: "blue",
-                            onClick: () => dispatch(addSkin()),
+                            onClick: () => {
+                                dispatch(addSkin());
+                            },
                         }}
                     >
                         Skins
                     </Heading2>
                     {itemState.skins.length > 0 ? (
                         itemState.skins.map((skin, index) => (
-                            <div style={{ marginBottom: "50px" }}>
+                            <div key={index} style={{ marginBottom: "50px" }}>
                                 <Header size="medium">Skin {index + 1}</Header>
                                 <Grid>
                                     <Grid.Row columns={2}>
@@ -163,15 +165,15 @@ const AddItemPage = () => {
                                                         onChange={(
                                                             e,
                                                             { value }
-                                                        ) =>
+                                                        ) => {
                                                             dispatch(
                                                                 setSkinVal({
                                                                     index: index,
                                                                     key: "skin_name",
                                                                     value: value,
                                                                 })
-                                                            )
-                                                        }
+                                                            );
+                                                        }}
                                                     >
                                                         Skin Name
                                                     </TextInput>
@@ -214,8 +216,8 @@ const AddItemPage = () => {
                         color="#F77F00"
                         text="Save Item"
                         onClick={() => {
-                            dispatch(addLotteryItem());
-                            dispatch(reset())
+                            dispatch(addLotteryItem(itemState));
+                            dispatch(reset());
                             navigate("/create-lottery");
                         }}
                     />
@@ -233,6 +235,7 @@ const AddItemPage = () => {
                 title="Discard Changes"
                 buttons={[
                     <Button
+                        key={0}
                         basic
                         color="red"
                         inverted
@@ -245,6 +248,7 @@ const AddItemPage = () => {
                         Discard Changes
                     </Button>,
                     <Button
+                        key={1}
                         basic
                         color="green"
                         inverted
