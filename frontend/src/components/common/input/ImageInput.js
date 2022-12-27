@@ -12,10 +12,7 @@ const ImageInput = ({ image, setImage, name }) => {
                     <Image src={image} />
                     <div className="hover-overlay">
                         <div className="image-button-container">
-                            <Button
-                                color="red"
-                                onClick={() => setImage("")}
-                            >
+                            <Button color="red" onClick={() => setImage("")}>
                                 Remove Image
                             </Button>
                             <br />
@@ -49,11 +46,12 @@ const ImageInput = ({ image, setImage, name }) => {
                 hidden
                 ref={fileInputRef}
                 onChange={({ target }) => {
-                    const localImageUrl = window.URL.createObjectURL(
-                        target.files[0]
-                    );
-                    console.log(localImageUrl);
-                    setImage(localImageUrl);
+                    const file = target.files[0];
+                    const reader = new FileReader();
+                    if (file) {
+                        reader.onloadend = () => setImage(reader.result);
+                        reader.readAsDataURL(file);
+                    }
                     fileInputRef.current.value = null;
                 }}
             />
