@@ -35,7 +35,9 @@ export const lotterySlice = createSlice({
         },
 
         editLotteryItem: (currentState, { payload }) => {
-            currentState.lottery_items[payload.index] = payload.item;
+            let item = { ...payload };
+            delete item.index;
+            currentState.lottery_items[payload.index] = item;
         },
 
         deleteLotteryItem: (currentState, { payload }) => {
