@@ -1,8 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import AuthenticationPage from "../pages/auth/AuthenticationPage";
 import InventoryPage from "../pages/inventory/InventoryPage";
-import AddItemPage from "../pages/lottery/item/AddItemPage";
-import EditItemPage from "../pages/lottery/item/EditItemPage";
+import EditAddItemPage from "../pages/lottery/EditAddItemPage";
 import CreateLotteryPage from "../pages/lottery/CreateLotteryPage";
 import EditLotteryPage from "../pages/lottery/EditLotteryPage";
 import LotteryDetailPage from "../pages/lottery/LotteryDetailPage";
@@ -31,11 +30,11 @@ const router = createBrowserRouter([
     },
     {
         path: "create-lottery/add-item",
-        element: <AddItemPage />,
+        element: <EditAddItemPage edit={false} />,
     },
     {
         path: "create-lottery/edit-item",
-        element: <EditItemPage />,
+        element: <EditAddItemPage edit={true} />,
     },
     {
         path: "lottery-details", // lottery-details/:lottery_id
