@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import jwt from "jsonwebtoken"
+// import jwt_decode from "jwt-decode"
 
 export const userSlice = createSlice({
     name: "user",
