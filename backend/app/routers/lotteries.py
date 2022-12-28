@@ -8,6 +8,7 @@ from ..schemas import Lottery, NewLottery, LotteryItem
 from typing import List
 from fastapi.encoders import jsonable_encoder
 from bson import ObjectId
+from datetime import date
 
 # variables
 authenticator = Authenticator()
@@ -29,8 +30,11 @@ router = APIRouter(
 async def create_lottery(new_lottery: NewLottery):
     """Create a new lottery."""
     new_lottery = jsonable_encoder(new_lottery)
-    new_items = new_lottery["items"]
-    del new_lottery['items']
+    new_items = new_lottery["lottery_items"]
+    del new_lottery['lottery_items']
+
+    # append date
+    new_lottery['date_created'] = str(date.today())
 
     # create new lottery
     lottery = lottery_db_handler.add_one(new_lottery)
@@ -93,9 +97,8 @@ def postprocess_lottery(lottery):
             possible_drops.append(drop)
     lottery['possible_drops'] = possible_drops
 
-    # add creator name and pp
+    # add creator name
     user = user_db_handler.get_one(ObjectId(lottery['creator_id']))
     lottery['creator_name'] = user['user_name']
-    lottery['creator_prof_pic'] = user['user_pp']
 
     return lottery

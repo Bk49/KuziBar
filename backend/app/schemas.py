@@ -35,7 +35,6 @@ class NewUser(BaseModel):
     user_name: str = Field(..., min_length=1, max_length=50)
     user_email: EmailStr = Field(...)
     user_password: str = Field(..., min_length=1)
-    user_pp: Union[str, None] = None
 
 
 class User(BaseModel):
@@ -43,7 +42,6 @@ class User(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     user_name: str = Field(..., min_length=1, max_length=50)
     user_email: EmailStr = Field(...)
-    user_pp: Union[str, None] = None
 
     class Config:
         allow_population_by_field_name = True
@@ -59,16 +57,14 @@ class User(BaseModel):
 
 
 class Skin(BaseModel):
-    skin_id: Union[str, None] = None
     skin_name: str = Field(...)
     skin_image: str = Field(...)
 
 
 class LotteryItem(BaseModel):
     item_name: str = Field(...)
-    item_image: str = Field(...)
+    image: str = Field(...)
     tier: int = Field(...)
-    drop_rate: float = Field(...)
     skins: Union[List[Skin], None] = []
 
 
@@ -78,7 +74,8 @@ class NewItem(LotteryItem):
 
 class SimpleItem(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    item_image: str
+    item_name: str = Field(...)
+    image: str
 
     class Config:
         allow_population_by_field_name = True
@@ -96,19 +93,16 @@ class Item(NewItem):
         schema_extra = {
             "example": {
                 "_id": "1234567890",
-                "item_pic": "item_pic_URL",
+                "image": "item_pic_URL",
                 "item_name": "item_name",
                 "tier": 1,
-                "drop_rate": 0.9,
                 "lottery_id": "sample_id",
                 "skins": [
                     {
-                        "skin_id": "12345",
                         "skin_name": "skin_name",
                         "skin_image": "skin_image_URL"
                     },
                     {
-                        "skin_id": "123456",
                         "skin_name": "skin_name2",
                         "skin_image": "skin_image_URL2"
                     }
@@ -117,15 +111,17 @@ class Item(NewItem):
         }
 
 
-class NewLottery(BaseModel):
+class BaseLottery(BaseModel):
     lottery_name: str = Field(...)
-    cover_image: str = Field(...)
+    image: str = Field(...)
     date_created: Union[datetime.date, None] = None
-    prize_per_pull: int = Field(...)
+    price: int = Field(...)
     creator_id: str = Field(...)
     remaining_tickets: int = Field(...)
     status: int = Field(..., ge=0, le=1)
-    items: Union[List[NewItem], None] = []
+
+class NewLottery(BaseLottery):
+    lottery_items: Union[List[LotteryItem], None] = []
 
     class Config:
         allow_population_by_field_name = True
@@ -133,11 +129,10 @@ class NewLottery(BaseModel):
         json_encoders = {ObjectId: str}
 
 
-class Lottery(NewLottery):
+class Lottery(BaseLottery):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     possible_drops: Union[List[SimpleItem], None] = []
     creator_name: str = None
-    creator_prof_pic: str = None
 
     class Config:
         allow_population_by_field_name = True
