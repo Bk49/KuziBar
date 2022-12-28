@@ -9,7 +9,7 @@ import { createSlice } from "@reduxjs/toolkit";
     
     Skins
         skin_name
-        image
+        skin_image
 */
 
 export const lotterySlice = createSlice({
