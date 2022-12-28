@@ -120,6 +120,7 @@ class BaseLottery(BaseModel):
     remaining_tickets: int = Field(...)
     status: int = Field(..., ge=0, le=1)
 
+
 class NewLottery(BaseLottery):
     lottery_items: Union[List[LotteryItem], None] = []
 
@@ -133,6 +134,22 @@ class Lottery(BaseLottery):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     possible_drops: Union[List[SimpleItem], None] = []
     creator_name: str = None
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+
+
+class NewTicket(BaseModel):
+    lottery_id: str = Field(...)
+    user_id: str = Field(...)
+    entry_quantity: int = Field(...)
+
+
+class Ticket(NewTicket):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    date_created: Union[datetime.date, None] = None
 
     class Config:
         allow_population_by_field_name = True

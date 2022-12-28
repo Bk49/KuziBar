@@ -1,6 +1,7 @@
 # API related packages
 from .routers import lotteries
 from .routers import users
+from .routers import ticket
 from fastapi import FastAPI, HTTPException, Depends, status, Body
 
 # Database
@@ -30,6 +31,7 @@ app = FastAPI()
 # routers
 app.include_router(users.router)
 app.include_router(lotteries.router)
+app.include_router(ticket.router)
 
 
 @app.get("/")
