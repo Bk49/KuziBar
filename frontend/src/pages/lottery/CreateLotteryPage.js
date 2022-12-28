@@ -5,12 +5,13 @@ import ImageInput from "../../components/common/input/ImageInput";
 import TextInput from "../../components/common/input/TextInput";
 import { useSelector, useDispatch } from "react-redux";
 import { setLotteryVal } from "../../redux/slice/lotterySlice";
-import { Form, Grid, Header } from "semantic-ui-react";
+import { Divider, Form, Grid, Header } from "semantic-ui-react";
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import "../../assets/css/pages/lottery/CreateLotteryPage.css";
 import CreateLotteryItemCard from "../../components/lottery/card/CreateLotteryItemCard";
 import calcDropRate from "../../functions/calcDropRate";
+import TextButton from "../../components/common/button/TextButton";
 
 const CreateLotteryPage = () => {
     const lotteryObj = useSelector((state) => state.lottery);
@@ -101,13 +102,30 @@ const CreateLotteryPage = () => {
                         <Grid.Row columns={2}>
                             {lotteryObj.lottery_items.length > 0 ? (
                                 lotteryObj.lottery_items.map((item, index) => (
-                                    <CreateLotteryItemCard index={index} lotteryObj={lotteryObj} dropRate={dropRate} dispatch={dispatch} navigate={navigate} />
+                                    <CreateLotteryItemCard
+                                        index={index}
+                                        lotteryObj={lotteryObj}
+                                        dropRate={dropRate}
+                                        dispatch={dispatch}
+                                        navigate={navigate}
+                                    />
                                 ))
                             ) : (
                                 <Header size="medium">No items</Header>
                             )}
                         </Grid.Row>
                     </Grid>
+                    <Divider />
+                    <div
+                        style={{
+                            display: "flex",
+                            flexDirection: "row-reverse",
+                        }}
+                    >
+                        <TextButton text="Save Lottery" color="#F77F00" />
+                        <div style={{ marginLeft: "0.6rem" }}></div>
+                        <TextButton text="Publish Lottery" color="#FCBF49" />
+                    </div>
                 </div>
             </div>
         </>
