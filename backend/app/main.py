@@ -1,65 +1,34 @@
 # API related packages
-from fastapi import FastAPI, Query, HTTPException, Depends, status
-from pydantic import BaseModel, EmailStr, Field
+from .routers import lotteries
+from .routers import users
+from fastapi import FastAPI, HTTPException, Depends, status, Body
 
-# MongoDB related packages
-from bson import ObjectId
-from schematics.models import Model
-from schematics.types import StringType, EmailType
-from pymongo import MongoClient
+# Database
+from .databases.user_db import User_DB_handler
+from .databases.token_db import Token_DB_handler
+from app.schemas import *
+from fastapi.encoders import jsonable_encoder
 
-# autehntication library
-from passlib.context import CryptContext
+# Authetication
+from fastapi.security import OAuth2PasswordRequestForm
+from app.auth import Authenticator
 
-# logging library
-import logging
-import app.settings as settings
+# logging
+from app.log import logger
 
-# logging handler
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("uvicorn.error")
-
-#  password handler
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-# mongoDB instance
-client = MongoClient(settings.mongodb_uri, settings.port)
-db = client.testingdata
-
-# user class on MongoDB
+# variables
+user_db_handler = User_DB_handler()
+token_db_handler = Token_DB_handler()
+authenticator = Authenticator()
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
-class Customer(Model):
-    cust_id = ObjectId()
-    cust_email = EmailType(required=True)
-    cust_name = StringType(required=True)
-    cust_password = StringType(required=True)
-
-
-# an instance of User
-newuser = Customer()
-
-# function to create user
-
-
-def create_user(email, username, password):
-    newuser.custid = ObjectId()
-    newuser.cust_email = email
-    newuser.cust_name = username
-    newuser.cust_password = password
-    return dict(newuser)
-
-# user class on fastAPI
-
-
-class User(BaseModel):
-    name: str = Field(..., min_length=3, max_length=50)
-    email: EmailStr = Field(...)
-    password: str = Field(..., min_length=8)
-
-
-# init fasrAPI
+# init FastAPI
 app = FastAPI()
+
+# routers
+app.include_router(users.router)
+app.include_router(lotteries.router)
 
 
 @app.get("/")
@@ -67,81 +36,54 @@ def zilliqa_mochi():
     return {"message": "Zilliqa mochi down town!"}
 
 
-@app.post("/login")
-async def login(email: str = Query(..., description="The email of the user"),
-                password: str = Query(..., description="The password of the user")):
-    """API entry point for login authentication.
-
-    Returns:
-        HTTPresponse: API response message
-    """
-    user = await authenticate_user(email, password)
-    if user:
-        return {"message": "Login successful"}
-    else:
-        raise HTTPException(
-            status_code=400, detail="Incorrect username or password")
-
-
-@app.post("/signup/")
-def add_user(user: User):
-    """Create a new user.
-
-    Args:
-        user (User): user instance with name, password and email.
-
-    Raises:
-        HTTPException: 400, if user already exist
-
-    Returns:
-        HTTPResponse: user created with corresponding details
-    """
-    user_exist = False
-    data = create_user(user.email, user.name, get_password_hash(user.password))
+@app.post("/signup/", summary="Register new user", response_model=User)
+def add_user(new_user: NewUser = Body(...)):
+    """Create a new user."""
+    new_user = jsonable_encoder(new_user)
 
     # check if email exist already
-    if db.users.find_one({'cust_email': data['cust_email']}) is not None:
-        user_exist = True
-        raise HTTPException(status_code=400, detail="Customer exists")
-    elif user_exist == False:
-        db.users.insert_one(data)
-        return {"message": "User created", "email": data['cust_email'], "name": data['cust_name']}
+    if user_db_handler.user_exist(new_user['user_email']):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User exists")
+    else:
+        new_user['user_password'] = authenticator.get_password_hash(
+            new_user['user_password'])
+        user = user_db_handler.add_one(new_user)
+        created_user = user_db_handler.get_one(user.inserted_id)
+        return created_user
 
 
-@app.get("/all_users/")
-def read_users():
-    """Read all users."""
-    documents = get_all_documents()
-    return {"messsage": str(documents)}
-
-
-def get_all_documents():
-    """Helper function to read all user."""
-    list_of_users = []
-    for user in db.users.find():
-        list_of_users.append(user)
-    return list_of_users
-
-
-def verify_password(plain_pw: str, hashed_pw: str):
-    """Verify password."""
-    return pwd_context.verify(plain_pw, hashed_pw)
-
-
-def get_password_hash(pw: str):
-    """Get hashed password."""
-    return pwd_context.hash(pw)
-
-
-async def authenticate_user(email: str, password: str):
-    """Authenticate the user using the email and password.
-
-    Returns:
-        bool: status of login
-    """
-    user = db.users.find_one({'cust_email': email})
+@app.post("/token/", response_model=Tokens, summary="Create access and refresh tokens for user")
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    """Login for access token."""
+    user = authenticator.authenticate_user(
+        form_data.username, form_data.password)
+    logger.info(f"LOOK HEREEEEE {str(user)}")
     if not user:
-        return False
-    if not verify_password(password, user["cust_password"]):
-        return False
-    return user
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token = authenticator.create_access_token(
+        data={"sub": user["user_email"]})
+    refresh_token = authenticator.create_refresh_token(
+        data={"sub": user["user_email"]})
+    return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
+
+
+@app.get('/logout/', summary="Log out user")
+def logout(token: str = Depends(authenticator.get_current_user_token)):
+    """Logout user and blacklist token."""
+    if token_db_handler.add_one({"token": token}):
+        return {'result': True}
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials, logout failed",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+
+@app.post('/refresh/', summary="Use refresh token to generate a new access token")
+async def refresh(new_token: str = Depends(authenticator.refresh_current_user)):
+    return {'result': True, 'access_token': new_token}

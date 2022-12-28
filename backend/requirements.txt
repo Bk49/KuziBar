@@ -7,3 +7,6 @@ pymongo==4.3.3
 connection==2021.7.20
 schematics==2.1.1
 passlib==1.7.4
+python-jose==3.3.0
+python-multipart==0.0.5
+motor==3.1.1
