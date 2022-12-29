@@ -1,3 +1,5 @@
+//this slice shd be used to store user's data
+
 import { createSlice } from "@reduxjs/toolkit";
 // import jwt_decode from "jwt-decode"
 
@@ -9,8 +11,9 @@ export const userSlice = createSlice({
         refresh_token: "",
     },
     reducers: {
-        setVal: (currentState, { payload }) =>
-            (currentState.payload.key = payload.value),
+        setCredentials: (currentState, { payload }) => {
+            currentState[payload.key] = payload.value;
+        },
 
         decodeToken: (currentState, { payload }) => {
             // This reducer func is supposed to decrypt the token and set it into the state
@@ -19,13 +22,13 @@ export const userSlice = createSlice({
         },
 
         logOut: (currentState) => ({
-           name: "",
-           access_token : "",
-           refresh_token : "",
+            name: "",
+            access_token: "",
+            refresh_token: "",
         }),
     },
 });
 
-export const { setVal, decodeToken, logOut } = userSlice.actions;
+export const { setCredentials, decodeToken, logOut } = userSlice.actions;
 
 export default userSlice.reducer;
