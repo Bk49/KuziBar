@@ -1,0 +1,62 @@
+.lottery-ticket-card-image-section-container {
+    position: relative;
+}
+
+.lottery-ticket-card-image-gradient {
+    position: relative;
+    display: inline-block;
+}
+
+.lottery-ticket-card-image-gradient:after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: inline-block;
+    background: -webkit-linear-gradient(
+        top,
+        rgba(0, 0, 0, 0.8) 0%,
+        rgba(0, 0, 0, 0.5) 20%,
+        rgba(0, 0, 0, 0) 37%
+    );
+}
+
+.lottery-ticket-card-creator-container {
+    position: absolute;
+    z-index: 1;
+    padding: 0.7rem 1rem;
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+    align-items: center;
+}
+
+.lottery-ticket-card-creator-initial-container {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: grey;
+    border-radius: 150px;
+    margin-right: 0.5rem;
+    border: 1px solid #eae2b7;
+}
+
+.lottery-ticket-card-creator-initial-text {
+    color: white;
+    text-align: center;
+}
+
+.lottery-ticket-card-creator-owner-name {
+    color: white;
+}
+
+.lottery-ticket-card-image {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+}
