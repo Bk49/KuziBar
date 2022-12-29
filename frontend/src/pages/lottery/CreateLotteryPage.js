@@ -1,4 +1,4 @@
-import NavBar from "../../components/common/nav/NavBar";
+ import NavBar from "../../components/common/nav/NavBar";
 import Heading1 from "../../components/common/header/Heading1";
 import Heading2 from "../../components/common/header/Heading2";
 import ImageInput from "../../components/common/input/ImageInput";
@@ -122,7 +122,13 @@ const CreateLotteryPage = () => {
                             flexDirection: "row-reverse",
                         }}
                     >
-                        <TextButton text="Save Lottery" color="#F77F00" />
+                        <TextButton 
+                            text="Save Lottery" 
+                            color="#F77F00" 
+                            onClick={() => {
+                              
+                            }}
+                        />
                         <div style={{ marginLeft: "0.6rem" }}></div>
                         <TextButton text="Publish Lottery" color="#FCBF49" />
                     </div>

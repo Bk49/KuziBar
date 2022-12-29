@@ -4,6 +4,7 @@ import "../../assets/css/pages/auth/AuthenticationPage.css";
 import TextInput from "../../components/common/input/TextInput";
 import { Button, Form } from "semantic-ui-react";
 import { useState } from "react";
+import  getAuth  from "../../axios/axios-auth";
 
 const AuthenticationPage = () => {
     const [loginFormData, setLoginFormData] = useState({
@@ -52,7 +53,11 @@ const AuthenticationPage = () => {
                         </Form.Group>
                     </Form>
                     {/* Login Button here */}
-                    <Button primary onClick={()=>{}}>Login</Button> 
+                    <Button 
+                        primary 
+                        onClick={ getAuth(loginFormData.email, loginFormData.password) } >
+                            Login
+                    </Button> 
                 </div>
                 <div className="register-container">
                     <Heading1>Register</Heading1>
