@@ -8,10 +8,11 @@ import instance from "../../axios/config";
 import { toFormData } from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { setCredentials } from "../../redux/slice/authSlice";
+import { useNavigate } from "react-router";
 
 const AuthenticationPage = () => {
-    const authObj = useSelector((state) => state.auth);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const [loginFormData, setLoginFormData] = useState({
         email: "",
@@ -59,8 +60,8 @@ const AuthenticationPage = () => {
                 access_token: accessToken,
                 refresh_token: refreshToken,
             };
-            console.log(credentialObj);
             dispatch(setCredentials(credentialObj));
+            navigate("/create-lottery");
         } catch (err) {
             if (!err?.reponse) {
                 console.log("No Server Response");

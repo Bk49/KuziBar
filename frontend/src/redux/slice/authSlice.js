@@ -8,8 +8,8 @@ export const authSlice = createSlice({
     name: "auth",
     initialState: {
         email: "",
-        access_token: "",
-        refresh_token: "",
+        access_token: null,
+        refresh_token: null,
     },
     reducers: {
         setCredentials: (currentState, { payload }) => {
@@ -20,24 +20,23 @@ export const authSlice = createSlice({
             //currentState[payload.key] = payload.value;
         },
 
-        decodeToken: (currentState, { payload }) => {
-            // This reducer func is supposed to decrypt the token and set it into the state
-            // Later on, we will use axios.interceptor to append the header before the request
-            //  is being sent to the back end for APIs that are not opened to public
+        setAccessToken: (currentState, { token }) => {
+            currentState.access_token = token;
         },
 
         logOut: (currentState) => ({
             email: "",
-            access_token: "",
-            refresh_token: "",
+            access_token: null,
+            refresh_token: null,
         }),
     },
 });
 
-export const { setCredentials, decodeToken, logOut } = authSlice.actions;
-
-export default authSlice.reducer;
+export const { setCredentials, decodeToken, logOut, setAccessToken } =
+    authSlice.actions;
 
 export const selectCurrentUser = (state) => state.auth.email;
 export const selectCurrentToken = (state) => state.auth.access_token;
 export const selectRefreshToken = (state) => state.auth.refresh_token;
+
+export default authSlice.reducer;
