@@ -5,19 +5,17 @@ import Heading2 from "../../components/common/header/Heading2";
 import ImageInput from "../../components/common/input/ImageInput";
 import TextInput from "../../components/common/input/TextInput";
 import NavBar from "../../components/common/nav/NavBar";
-import {
-    addSkin,
-    removeSkin,
-    reset,
-    setItemVal,
-    setSkinVal,
-} from "../../redux/slice/itemSlice";
+import VariantInput from "../../components/lottery/input/VariantInput";
+import { addSkin, reset, setItemVal } from "../../redux/slice/itemSlice";
 import { Header } from "semantic-ui-react";
 import TextButton from "../../components/common/button/TextButton";
 import { useState } from "react";
 import ConfirmationModal from "../../components/common/modal/ConfirmationModal";
 import { useNavigate } from "react-router";
-import { addLotteryItem, editLotteryItem } from "../../redux/slice/lotterySlice";
+import {
+    addLotteryItem,
+    editLotteryItem,
+} from "../../redux/slice/lotterySlice";
 
 const EditAddItemPage = ({ edit }) => {
     const itemState = useSelector((state) => state.item);
@@ -119,85 +117,12 @@ const EditAddItemPage = ({ edit }) => {
                     </Heading2>
                     {itemState.skins.length > 0 ? (
                         itemState.skins.map((skin, index) => (
-                            <div key={index} style={{ marginBottom: "50px" }}>
-                                <Header size="medium">Skin {index + 1}</Header>
-                                <Grid>
-                                    <Grid.Row columns={2}>
-                                        <Grid.Column width={4}>
-                                            <ImageInput
-                                                name={`Skin ${index + 1} Image`}
-                                                image={
-                                                    itemState.skins[index]
-                                                        .skin_image
-                                                }
-                                                setImage={(img) => {
-                                                    dispatch(
-                                                        setSkinVal({
-                                                            key: "skin_image",
-                                                            value: img,
-                                                            index: index,
-                                                        })
-                                                    );
-                                                }}
-                                            />
-                                        </Grid.Column>
-                                        <Grid.Column>
-                                            <Form style={{ height: "100%" }}>
-                                                <Form.Group
-                                                    style={{
-                                                        height: "100%",
-                                                        display: "flex",
-                                                        flexDirection: "column",
-                                                        justifyContent:
-                                                            "center",
-                                                    }}
-                                                >
-                                                    <TextInput
-                                                        width={9}
-                                                        value={
-                                                            itemState.skins[
-                                                                index
-                                                            ].skin_name
-                                                        }
-                                                        placeholder={`4D Ticket Type ${
-                                                            index + 1
-                                                        }`}
-                                                        onChange={(
-                                                            e,
-                                                            { value }
-                                                        ) => {
-                                                            dispatch(
-                                                                setSkinVal({
-                                                                    index: index,
-                                                                    key: "skin_name",
-                                                                    value: value,
-                                                                })
-                                                            );
-                                                        }}
-                                                    >
-                                                        Skin Name
-                                                    </TextInput>
-                                                    <br />
-                                                    <div>
-                                                        <Button
-                                                            color="red"
-                                                            onClick={() =>
-                                                                dispatch(
-                                                                    removeSkin({
-                                                                        index: index,
-                                                                    })
-                                                                )
-                                                            }
-                                                        >
-                                                            Delete Skin
-                                                        </Button>
-                                                    </div>
-                                                </Form.Group>
-                                            </Form>
-                                        </Grid.Column>
-                                    </Grid.Row>
-                                </Grid>
-                            </div>
+                            <VariantInput
+                                key={index}
+                                index={index}
+                                itemState={itemState}
+                                dispatch={dispatch}
+                            />
                         ))
                     ) : (
                         <>
@@ -216,10 +141,8 @@ const EditAddItemPage = ({ edit }) => {
                         color="#F77F00"
                         text={`Save ${edit ? "Changes" : "Item"}`}
                         onClick={() => {
-                            if (edit)
-                                dispatch(editLotteryItem(itemState))
-                            else
-                                dispatch(addLotteryItem(itemState));
+                            if (edit) dispatch(editLotteryItem(itemState));
+                            else dispatch(addLotteryItem(itemState));
                             dispatch(reset());
                             navigate("/create-lottery");
                         }}
