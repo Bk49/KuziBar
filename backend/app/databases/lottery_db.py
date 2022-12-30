@@ -19,4 +19,16 @@ class Lottery_DB_handler(DB_handler):
         # Update the document
         return self.collection.update_one(query, update)
     
+    def get_user_lottery(self, user_id: str):
+        """Get the lotteries by user_id."""
+        return self.collection.find({'creator_id': user_id})
+    
+    def get_user_lottery_published(self, user_id: str):
+        """Get the published lotteries by user_id."""
+        return self.collection.find({'creator_id': user_id, 'status': 1})
+    
+    def get_user_lottery_drafts(self, user_id: str):
+        """Get the drafted lotteries by user_id."""
+        return self.collection.find({'creator_id': user_id, 'status': 0})
+    
     
