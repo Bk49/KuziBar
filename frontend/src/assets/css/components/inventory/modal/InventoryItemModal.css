@@ -1,0 +1,11 @@
+.inventory-item-modal-image-container {
+    height: 25rem;
+    width: 25rem;
+}
+
+.inventory-item-modal-image {
+    width: 100%;
+    border-radius: 7px;
+    aspect-ratio: 1;
+    object-fit: cover;
+}
