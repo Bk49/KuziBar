@@ -49,15 +49,15 @@ async def create_lottery(new_lottery: NewLottery):
     return created_lottery
 
 
-@router.get("/", response_description="List all lotteries", response_model=List[Lottery])
-async def read_lotteries():
-    """Read all lotteries."""
-    lotteries = lottery_db_handler.get_all()
+@router.get("/", response_description="List all published lotteries", response_model=List[Lottery])
+async def read_published_lotteries():
+    """Read all published lotteries."""
+    lotteries = lottery_db_handler.get_published_lottery()
 
     for lottery in lotteries:
         lottery = postprocess_lottery(lottery)
 
-    logger.info(f"Successfully read all lotteries.")
+    logger.info(f"Successfully read all published lotteries.")
     return lotteries
 
 

@@ -6,6 +6,10 @@ class Lottery_DB_handler(DB_handler):
     def __init__(self) -> None:
         super().__init__()
         self.collection = self.db.lottery
+    
+    def get_published_lottery(self):
+        """Get all published lotteries."""
+        return list(self.collection.find({'status': 1}))
 
     def get_remaining_tickets(self, id: str):
         lottery = self.get_one(ObjectId(id))
