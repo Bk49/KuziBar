@@ -18,3 +18,5 @@ class Lottery_DB_handler(DB_handler):
 
         # Update the document
         return self.collection.update_one(query, update)
+    
+    

@@ -17,3 +17,8 @@ class Ticket_DB_handler(DB_handler):
 
         # Update the document
         return self.collection.update_one(query, update)
+    
+    def get_user_tickets(self, user_id: str):
+        """Get the ticket by user_id."""
+        return self.collection.find({'user_id': user_id})
+    

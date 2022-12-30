@@ -66,6 +66,9 @@ class LotteryItem(BaseModel):
     image: str = Field(...)
     tier: int = Field(...)
     skins: Union[List[Skin], None] = []
+    owner_id: str = None
+    NFT_address: str = None
+    date_to_finalize: Union[datetime.date, None] = None
 
 
 class NewItem(LotteryItem):
@@ -111,12 +114,15 @@ class Item(NewItem):
         }
 
 
-class BaseLottery(BaseModel):
+class BaseBaseLottery(BaseModel):
     lottery_name: str = Field(...)
     image: str = Field(...)
-    date_created: Union[datetime.date, None] = None
     price: int = Field(...)
     creator_id: str = Field(...)
+
+
+class BaseLottery(BaseBaseLottery):
+    date_created: Union[datetime.date, None] = None
     remaining_tickets: int = Field(...)
     status: int = Field(..., ge=0, le=1)
 
@@ -150,6 +156,18 @@ class NewTicket(BaseModel):
 class Ticket(NewTicket):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     date_created: Union[datetime.date, None] = None
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+
+
+class LotteryTicket(BaseBaseLottery):
+    ticket_quantity: int = None
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    possible_drops: Union[List[SimpleItem], None] = []
+    creator_name: str = None
 
     class Config:
         allow_population_by_field_name = True

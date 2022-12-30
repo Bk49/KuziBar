@@ -38,8 +38,10 @@ def create_ticket(new_ticket: NewTicket):
     if (ticket := ticket_db_handler.get_one(new_ticket['lottery_id'], new_ticket['user_id'])) is not None:
         # increase quantity of existing ticket
         logger.info(f"Ticket exists, increase entry quantity.")
-        updated_ticket = ticket_db_handler.update_quantity(
+        ticket_db_handler.update_quantity(
             new_ticket['lottery_id'], new_ticket['user_id'], new_ticket['entry_quantity'])
+        updated_ticket = ticket_db_handler.get_one(
+            new_ticket['lottery_id'], new_ticket['user_id'])
         logger.info("Successfully updated existing ticket.")
     else:
         # create new ticket
