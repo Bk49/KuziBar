@@ -1,0 +1,18 @@
+.purchase-modal-image-container {
+    height: 25rem;
+    width: 25rem;
+}
+
+.purchase-modal-image {
+    width: 100%;
+    border-radius: 7px;
+    aspect-ratio: 1;
+    object-fit: cover;
+}
+
+.purchase-modal-description-container {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: space-between;
+}
