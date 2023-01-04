@@ -12,6 +12,7 @@ import "../../assets/css/pages/lottery/CreateLotteryPage.css";
 import CreateLotteryItemCard from "../../components/lottery/card/CreateLotteryItemCard";
 import calcDropRate from "../../functions/calcDropRate";
 import TextButton from "../../components/common/button/TextButton";
+import instance from "../../axios/config";
 
 const CreateLotteryPage = () => {
     const lotteryObj = useSelector((state) => state.lottery);
@@ -21,6 +22,34 @@ const CreateLotteryPage = () => {
         5.0, 8.0, 12.0, 15.0, 18.0, 20.0, 22.0,
     ]);
 
+    const submitLottery = async () => {
+        const LOTTERY_URL = "/lottery";
+
+        const data = {
+            lottery_name: lotteryObj.lottery_name,
+            cover_iamge: lotteryObj.lottery_name,
+            date_created: lotteryObj.lottery_name,
+            prize_per_pull: lotteryObj.lottery_name,
+            creator_id: lotteryObj.lottery_name,
+            remaining_tickets: lotteryObj.lottery_name,
+            status: 1,
+            items: lotteryObj.lottery_items,
+        };
+        const config = {
+            headers: {
+                "Content-Type": "application/json",
+                accept: "application/json",
+            },
+        };
+        try {
+            const response = await instance.post(LOTTERY_URL, data, config);
+            console.log(response.data);
+        } catch (err) {
+            if (err.response.status === 401) {
+                navigate("/login");
+            }
+        }
+    };
     useEffect(() => {
         setDropRate(calcDropRate(lotteryObj.lottery_items));
     }, [lotteryObj.lottery_items]);
@@ -122,7 +151,11 @@ const CreateLotteryPage = () => {
                             flexDirection: "row-reverse",
                         }}
                     >
-                        <TextButton text="Save Lottery" color="#F77F00" />
+                        <TextButton
+                            text="Save Lottery"
+                            color="#F77F00"
+                            onClick={submitLottery}
+                        />
                         <div style={{ marginLeft: "0.6rem" }}></div>
                         <TextButton text="Publish Lottery" color="#FCBF49" />
                     </div>
