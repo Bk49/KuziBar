@@ -28,7 +28,7 @@ const AuthenticationPage = () => {
         e.preventDefault();
 
         //declare url
-        const TOKEN_URL = "/token";
+        const TOKEN_URL = "/token/";
 
         //append data to formdata, which is specified in the API
         const bodyFormData = new FormData();
@@ -64,6 +64,7 @@ const AuthenticationPage = () => {
             navigate("/create-lottery");
         } catch (err) {
             if (!err?.reponse) {
+                console.log(err);
                 console.log("No Server Response");
             } else if (err.response?.status === 400) {
                 console.log("Missing username or password");
