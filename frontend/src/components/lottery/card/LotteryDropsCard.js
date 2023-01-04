@@ -4,7 +4,7 @@ import { Card, Label } from "semantic-ui-react";
 import handleColor from "../../../functions/handleColor";
 import { useEffect, useState } from "react";
 
-const LotteryDropsCard = ({ item }) => {
+const LotteryDropsCard = ({ item, ...rest }) => {
     const [color, setColor] = useState("grey");
 
     useEffect(() => {
@@ -12,7 +12,7 @@ const LotteryDropsCard = ({ item }) => {
     }, [item.tier]);
 
     return (
-        <Card color={color}>
+        <Card color={color} {...rest}>
             <img className="lottery-drops-card-item-image" src={item.image} alt=""/>
             <Label attached="top right" color={color}>Tier {item.tier}</Label>
             <Card.Content style={{ border: "none" }}>

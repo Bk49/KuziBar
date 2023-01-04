@@ -4,9 +4,9 @@ import { Card, Grid, Icon } from "semantic-ui-react";
 import LotteryCardItemImage from "../../common/image/LotteryCardItemImage";
 import "../../../assets/css/components/inventory/card/LotteryTicketCard.css";
 
-const LotteryTicketCard = ({ lotteryObj }) => {
+const LotteryTicketCard = ({ lotteryObj, ...rest }) => {
     return (
-        <Card color="brown" style={{ overflow: "hidden" }}>
+        <Card {...rest} color="brown" style={{ overflow: "hidden" }}>
             <div className="lottery-ticket-card-image-section-container">
                 <div className="lottery-ticket-card-creator-container">
                     <div className="lottery-ticket-card-creator-initial-container">

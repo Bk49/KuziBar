@@ -1,0 +1,9 @@
+{
+    "Database": {
+        "MONGODB_URL": "mongodb+srv://yungxin:yungxinpassword@mochi.j3njxdv.mongodb.net/mochi?retryWrites=true&w=majority"
+    },
+    "User_credentials": {
+        "username": "admin",
+        "password": "password"
+    }
+}

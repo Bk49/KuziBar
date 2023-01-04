@@ -3,9 +3,9 @@ import { Card } from "semantic-ui-react";
 import handleColor from "../../../functions/handleColor";
 import "../../../assets/css/components/inventory/card/CustomizableItemCard.css";
 
-const CustomizableItemCard = ({ item }) => {
+const CustomizableItemCard = ({ item, ...rest }) => {
     return (
-        <Card color={handleColor(item.tier)}>
+        <Card color={handleColor(item.tier)} {...rest}>
             <div className="customizable-item-card-image-section-container">
                 <div className="customizable-item-card-creator-container">
                     <div className="customizable-item-card-creator-initial-container">
