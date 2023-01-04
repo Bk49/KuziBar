@@ -1,6 +1,5 @@
 from app.databases.db import DB_handler
 from ..schemas import SimpleItem
-from ..log import logger
 
 class Item_DB_handler(DB_handler):
     def __init__(self) -> None:
@@ -14,7 +13,7 @@ class Item_DB_handler(DB_handler):
         try:
             cursor = self.collection.aggregate(pipeline, allowDiskUse=True)
             document = cursor.next()
-            item = SimpleItem(id=document['_id'], item_image=document['item_image'])
+            item = SimpleItem(id=document['_id'], image=document['image'], item_name=document['item_name'])
             return item
         except StopIteration:
             return None
@@ -24,6 +23,21 @@ class Item_DB_handler(DB_handler):
         filter = {"lottery_id": lottery_id}
 
         return list(self.collection.find(filter))
+    
+    def get_owned_items(self, user_id: str):
+        """Get all items of a user."""
+        filter = {"owner_id": user_id}
 
+        return list(self.collection.find(filter))
+
+    def get_customizable_items(self, user_id: str):
+        """Get customizable items of a user."""
+        filter = {
+            "owner_id": user_id,
+            "skin": {"$ne": []},
+            "date_to_finalize" : None
+        }
+
+        return list(self.collection.find(filter))
     
     

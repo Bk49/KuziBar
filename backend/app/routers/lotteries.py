@@ -1,21 +1,23 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from ..auth import Authenticator
 from ..databases.lottery_db import Lottery_DB_handler
-from ..databases.item_db import Item_DB_handler 
+from ..databases.item_db import Item_DB_handler
 from ..databases.user_db import User_DB_handler
-from ..log import logger
+from ..log import Logger
 from ..schemas import Lottery, NewLottery, LotteryItem
 from typing import List
 from fastapi.encoders import jsonable_encoder
 from bson import ObjectId
+from datetime import date
 
-
+# variables
 authenticator = Authenticator()
 lottery_db_handler = Lottery_DB_handler()
 item_db_handler = Item_DB_handler()
 user_db_handler = User_DB_handler()
+logger = Logger("lottery")
 
-
+# router definition
 router = APIRouter(
     prefix="/lottery",
     tags=["lottery"],
@@ -26,9 +28,13 @@ router = APIRouter(
 
 @router.post("/", response_description="Add new lottery", response_model=Lottery)
 async def create_lottery(new_lottery: NewLottery):
+    """Create a new lottery."""
     new_lottery = jsonable_encoder(new_lottery)
-    new_items = new_lottery["items"]
-    del new_lottery['items']
+    new_items = new_lottery["lottery_items"]
+    del new_lottery['lottery_items']
+
+    # append date
+    new_lottery['date_created'] = str(date.today())
 
     # create new lottery
     lottery = lottery_db_handler.add_one(new_lottery)
@@ -39,37 +45,48 @@ async def create_lottery(new_lottery: NewLottery):
         new_item["lottery_id"] = str(lottery.inserted_id)
         item_db_handler.add_one(new_item)
 
+    logger.info(f"Successfully created new lottery, id: {str(lottery.inserted_id)}")
     return created_lottery
 
 
-@router.get("/", response_description="List all lotteries", response_model=List[Lottery])
-async def read_lotteries():
-    lotteries = lottery_db_handler.get_all()
+@router.get("/", response_description="List all published lotteries", response_model=List[Lottery])
+async def read_published_lotteries():
+    """Read all published lotteries."""
+    lotteries = lottery_db_handler.get_published_lottery()
 
     for lottery in lotteries:
         lottery = postprocess_lottery(lottery)
 
+    logger.info(f"Successfully read all published lotteries.")
     return lotteries
 
 
 @router.get("/{id}", response_description="Get a single lottery", response_model=Lottery)
 async def read_lottery(id: str):
+    """Retrieve a lottery using its id."""
     if (lottery := lottery_db_handler.get_one(ObjectId(id))) is not None:
         lottery = postprocess_lottery(lottery)
+        logger.info(f"Lottery id {id} found.")
         return lottery
 
+    logger.error(f"Lottery id {id} not found.")
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                         detail=f"Lottery {id} not found")
+
 
 @router.get("/{id}/items", response_description="Get the items of a lottery", response_model=List[LotteryItem])
 async def read_lottery(id: str):
     if (lottery := lottery_db_handler.get_one(ObjectId(id))) is None:
+        logger.error(f"Lottery id {id} not found, items not returned.")
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail=f"Lottery {id} not found")
-    
+
+    # get all items of the lottery
     items = item_db_handler.get_lottery_items(id)
 
+    logger.info(f"Lottery id {id} found, returned all items.")
     return items
+
 
 def postprocess_lottery(lottery):
     """Post process lottery document returned from database to include more info."""
@@ -80,9 +97,8 @@ def postprocess_lottery(lottery):
             possible_drops.append(drop)
     lottery['possible_drops'] = possible_drops
 
-    # add creator name and pp
+    # add creator name
     user = user_db_handler.get_one(ObjectId(lottery['creator_id']))
     lottery['creator_name'] = user['user_name']
-    lottery['creator_prof_pic'] = user['user_pp']
 
     return lottery
