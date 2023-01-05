@@ -5,7 +5,7 @@ from ..databases.item_db import Item_DB_handler
 from ..databases.lottery_db import Lottery_DB_handler
 from ..databases.ticket_db import Ticket_DB_handler
 from ..log import Logger
-from ..schemas import User, Item, LotteryTicket, Lottery
+from ..schemas import User, Item, LotteryTicket, Lottery, Ticket
 from typing import List
 from bson import ObjectId
 from app.routers.lotteries import postprocess_lottery
@@ -165,3 +165,20 @@ async def read_user_lottery_published(id: str):
     logger.error(f"Failed to read published lotteries.")
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                         detail=f"Failed to read published lotteries of user {id}.")
+
+
+@router.get("/{id}/ticket", response_model=List[Ticket])
+async def read_user_ticket(id: str):
+    """Read owned tickets of a user."""
+
+    if (user := user_db_handler.get_one(ObjectId(id))) is not None:
+        logger.info(
+            f"Successfully read user by id, proceed to retrieve owned tickets.")
+        tickets = ticket_db_handler.get_user_tickets(id)
+
+        logger.info(f"Successfully get owned tickets.")
+        return tickets
+
+    logger.error(f"Failed to read owned tickets.")
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                        detail=f"Failed to read owned tickets of user {id}.")

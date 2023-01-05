@@ -75,7 +75,7 @@ async def read_lottery(id: str):
 
 
 @router.get("/{id}/items", response_description="Get the items of a lottery", response_model=List[LotteryItem])
-async def read_lottery(id: str):
+async def read_lottery_items(id: str):
     if (lottery := lottery_db_handler.get_one(ObjectId(id))) is None:
         logger.error(f"Lottery id {id} not found, items not returned.")
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
@@ -85,6 +85,20 @@ async def read_lottery(id: str):
     items = item_db_handler.get_lottery_items(id)
 
     logger.info(f"Lottery id {id} found, returned all items.")
+    return items
+
+
+@router.get("/{id}/ten_items", response_description="Get the top 10 items of a lottery", response_model=List[LotteryItem])
+async def read_10_lottery_items(id: str):
+    if (lottery := lottery_db_handler.get_one(ObjectId(id))) is None:
+        logger.error(f"Lottery id {id} not found, items not returned.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail=f"Lottery {id} not found")
+
+    # get top 10 items of the lottery
+    items = item_db_handler.get_10_items(id)
+
+    logger.info(f"Lottery id {id} found, returned top 10 items.")
     return items
 
 

@@ -20,5 +20,6 @@ class Ticket_DB_handler(DB_handler):
     
     def get_user_tickets(self, user_id: str):
         """Get the ticket by user_id."""
-        return self.collection.find({'user_id': user_id})
+        return list(self.collection.find({'user_id': user_id}))
+            
     

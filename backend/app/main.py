@@ -1,11 +1,10 @@
 # API related packages
-from .routers import lotteries
-from .routers import users
-from .routers import ticket
+from .routers import lotteries, item, users, ticket
 from fastapi import FastAPI, HTTPException, Depends, status, Body
 
-#CORS 
+# CORS
 from fastapi.middleware.cors import CORSMiddleware
+
 # Database
 from .databases.user_db import User_DB_handler
 from .databases.token_db import Token_DB_handler
@@ -30,24 +29,26 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 # init FastAPI
 app = FastAPI()
 
-# declare origins 
+# declare origins
 origins = [
     "http://localhost",
     "http://localhost:3000"
 ]
 
-# add origin to CORS 
+# add origin to CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins = origins,
-    allow_credentials = True,
-    allow_methods= ["*"],
-    allow_headers = ["*"]
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
 )
+
 # routers
 app.include_router(users.router)
 app.include_router(lotteries.router)
 app.include_router(ticket.router)
+app.include_router(item.router)
 
 
 @app.get("/")
