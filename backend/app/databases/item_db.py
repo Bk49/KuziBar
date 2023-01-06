@@ -10,17 +10,13 @@ class Item_DB_handler(DB_handler):
 
     def get_item_by_tier(self, lottery_id: str, item_tier: int):
         """Get possible drops of a lottery."""
-        pipeline = [{"$match": {"tier": item_tier, "lottery_id": lottery_id}}, {
-            "$sample": {"size": 1}}]
-
-        try:
-            cursor = self.collection.aggregate(pipeline, allowDiskUse=True)
-            document = cursor.next()
+        item = self.get_item_by_tier_full(lottery_id, item_tier)
+        if item:
             item = SimpleItem(
-                id=document['_id'], image=document['image'], item_name=document['item_name'])
+                id=item['_id'], image=item['image'], item_name=item['item_name'])
             return item
-        except StopIteration:
-            return None
+        else:
+            return item
 
     def get_lottery_items(self, lottery_id: str):
         """Get all items of a lottery."""
@@ -84,11 +80,11 @@ class Item_DB_handler(DB_handler):
         item_list.extend(list(random_documents))
         return item_list
 
-
     def get_low_tier(self, lottery_id: str):
         """Get a random item that is not in high tier"""
         condition = [
-            {"$match": {"lottery_id": lottery_id, "tier": {"$nin": [1, 2, 3, 4]}}},
+            {"$match": {"lottery_id": lottery_id,
+                        "tier": {"$nin": [1, 2, 3, 4]}}},
             {"$sample": {"size": 1}}
         ]
         try:
@@ -96,9 +92,9 @@ class Item_DB_handler(DB_handler):
             document = cursor.next()
         except StopIteration:
             return None
-        
+
         return document
-    
+
     def get_item_by_tier_full(self, lottery_id: str, item_tier: int):
         """Get possible drops of a lottery."""
         pipeline = [{"$match": {"tier": item_tier, "lottery_id": lottery_id}}, {

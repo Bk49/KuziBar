@@ -127,6 +127,14 @@ class BaseLottery(BaseBaseLottery):
     status: int = Field(..., ge=0, le=1)
 
 
+class LotteryData(BaseLottery):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+
 class NewLottery(BaseLottery):
     lottery_items: Union[List[LotteryItem], None] = []
 

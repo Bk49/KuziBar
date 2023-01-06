@@ -1,5 +1,5 @@
 from pymongo import MongoClient
-
+from bson import ObjectId
 
 class DB_handler:
     MONGODB_URL = "mongodb+srv://yungxin:yungxinpassword@mochi.j3njxdv.mongodb.net/mochi?retryWrites=true&w=majority"
@@ -21,3 +21,12 @@ class DB_handler:
     def get_all(self):
         """Read all entries."""
         return list(self.collection.find())
+    
+    def put_one(self, id: str, replacement: dict):
+        """Replace one entry."""
+        filter = {"_id": id}
+        result = self.collection.replace_one(filter, replacement)
+        if result.modified_count == 1:
+            return self.collection.find_one({"_id": id})
+        else:
+            return None
