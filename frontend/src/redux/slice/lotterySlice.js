@@ -18,7 +18,7 @@ export const lotterySlice = createSlice({
         image: "",
         lottery_name: "",
         price: 10.0,
-        status: "draft",
+        status: 0,
         lottery_items: [],
     },
     reducers: {
