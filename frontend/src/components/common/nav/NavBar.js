@@ -7,9 +7,23 @@ import { useNavigate } from "react-router-dom";
 import TextButton from "../button/TextButton";
 import TextIconButton from "../button/TextIconButton";
 import { ReactComponent as WalletIcon } from "../../../assets/icons/Wallet Filled.svg";
+import { useEffect, useState } from "react";
+import jwtDecode from "jwt-decode";
 
 const NavBar = ({ currentPage }) => {
     const navigate = useNavigate();
+    const [userEmail, setUserEmail] = useState("");
+    const [update, setUpdate] = useState(0);
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        console.log(token);
+        if (token) {
+            setUserEmail(jwtDecode(token).sub);
+        } else {
+            setUserEmail("");
+        }
+    }, [update]);
 
     return (
         <div className="nav-container">
@@ -49,7 +63,28 @@ const NavBar = ({ currentPage }) => {
                         />
                     </div>
                     <div className="button-container">
-                        <TextButton onClick={() => navigate("/login")} text="Login" color="#F77F00" />
+                        {userEmail && userEmail.length > 0 ? (
+                            <div
+                                onClick={() => {
+                                    if (localStorage.getItem("token"))
+                                        localStorage.removeItem("token");
+                                    if (localStorage.getItem("userId"))
+                                        localStorage.removeItem("userId");
+                                    setUpdate((prev) => ++prev);
+                                }}
+                                className="user-initial-container"
+                            >
+                                <span className="user-initial-text">
+                                    {userEmail[0]}
+                                </span>
+                            </div>
+                        ) : (
+                            <TextButton
+                                onClick={() => navigate("/login")}
+                                text="Login"
+                                color="#F77F00"
+                            />
+                        )}
                     </div>
                 </div>
             </div>

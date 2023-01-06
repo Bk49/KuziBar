@@ -4,14 +4,10 @@ import "../../assets/css/pages/auth/AuthenticationPage.css";
 import TextInput from "../../components/common/input/TextInput";
 import { Button, Form } from "semantic-ui-react";
 import { useState } from "react";
-import instance from "../../axios/config";
-import { toFormData } from "axios";
-import { useSelector, useDispatch } from "react-redux";
-import { setCredentials } from "../../redux/slice/authSlice";
 import { useNavigate } from "react-router";
+import { getUserId, login, register } from "../../axios/authAPI";
 
 const AuthenticationPage = () => {
-    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const [loginFormData, setLoginFormData] = useState({
@@ -19,62 +15,11 @@ const AuthenticationPage = () => {
         password: "",
     });
     const [registerFormData, setRegisterFormData] = useState({
-        email: "",
-        password: "",
+        user_name: "",
+        user_email: "",
+        user_password: "",
         confirmPassword: "",
     });
-
-    const getAuth = async (e) => {
-        e.preventDefault();
-
-        //declare url
-        const TOKEN_URL = "/token/";
-
-        //append data to formdata, which is specified in the API
-        const bodyFormData = new FormData();
-        const email = loginFormData.email;
-        const password = loginFormData.password;
-        bodyFormData.append("username", email);
-        bodyFormData.append("password", password);
-
-        //declare header
-        const config = {
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-                accept: "application/json",
-            },
-        };
-
-        try {
-            const response = await instance.post(
-                TOKEN_URL,
-                bodyFormData,
-                config
-            );
-            console.log(response.data);
-            const accessToken = response?.data?.access_token;
-            const refreshToken = response?.data?.refresh_token;
-
-            const credentialObj = {
-                email: email,
-                access_token: accessToken,
-                refresh_token: refreshToken,
-            };
-            dispatch(setCredentials(credentialObj));
-            navigate("/create-lottery");
-        } catch (err) {
-            if (!err?.reponse) {
-                console.log(err);
-                console.log("No Server Response");
-            } else if (err.response?.status === 400) {
-                console.log("Missing username or password");
-            } else if (err.response?.status === 401) {
-                console.log("Unauthorized");
-            } else {
-                console.log("Login Failed");
-            }
-        }
-    };
 
     return (
         <>
@@ -112,7 +57,31 @@ const AuthenticationPage = () => {
                         </Form.Group>
                     </Form>
                     {/* Login Button here */}
-                    <Button primary onClick={getAuth}>
+                    <Button
+                        primary
+                        onClick={(e) => {
+                            e.preventDefault();
+                            login(loginFormData)
+                                .then(({ data }) => {
+                                    const { access_token } = data;
+                                    if (localStorage.getItem("token"))
+                                        localStorage.removeItem("token");
+                                    localStorage.setItem("token", access_token);
+                                })
+                                .then(() => {
+                                    getUserId()
+                                        .then(({ data }) => {
+                                            localStorage.setItem(
+                                                "userId",
+                                                data._id
+                                            );
+                                        })
+                                        .catch((e) => console.log(e));
+                                })
+                                .then(() => navigate("/"))
+                                .catch((e) => console.log(e));
+                        }}
+                    >
                         Login
                     </Button>
                 </div>
@@ -121,11 +90,11 @@ const AuthenticationPage = () => {
                     <Form>
                         <Form.Group widths={4}>
                             <TextInput
-                                value={registerFormData.email}
+                                value={registerFormData.user_email}
                                 onChange={(e, { value }) =>
                                     setRegisterFormData((prev) => ({
                                         ...prev,
-                                        email: value,
+                                        user_email: value,
                                     }))
                                 }
                                 placeholder="johndoe@example.com"
@@ -133,12 +102,24 @@ const AuthenticationPage = () => {
                                 Email
                             </TextInput>
                             <TextInput
-                                type="password"
-                                value={registerFormData.password}
+                                value={registerFormData.user_name}
                                 onChange={(e, { value }) =>
                                     setRegisterFormData((prev) => ({
                                         ...prev,
-                                        password: value,
+                                        user_name: value,
+                                    }))
+                                }
+                                placeholder="John doe"
+                            >
+                                Username
+                            </TextInput>
+                            <TextInput
+                                type="password"
+                                value={registerFormData.user_password}
+                                onChange={(e, { value }) =>
+                                    setRegisterFormData((prev) => ({
+                                        ...prev,
+                                        user_password: value,
                                     }))
                                 }
                                 placeholder="********"
@@ -161,7 +142,40 @@ const AuthenticationPage = () => {
                         </Form.Group>
                     </Form>
                     {/* Register Button here */}
-                    <Button color="teal" onClick={() => {}}>
+                    <Button
+                        color="teal"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            register(registerFormData)
+                                .then(({ data }) => {
+                                    if (localStorage.getItem("userId"))
+                                        localStorage.removeItem("userId");
+                                    localStorage.setItem("userId", data._id);
+                                    const { user_email, user_password } =
+                                        registerFormData;
+                                    login({
+                                        email: user_email,
+                                        password: user_password,
+                                    })
+                                        .then(({ data }) => {
+                                            console.log("Data", data)
+                                            if (localStorage.getItem("token"))
+                                                localStorage.removeItem(
+                                                    "token"
+                                                );
+                                            localStorage.setItem(
+                                                "token",
+                                                data.access_token
+                                            );
+                                        })
+                                        .catch((e) => {
+                                            throw e;
+                                        });
+                                })
+                                .then(() => navigate("/"))
+                                .catch((e) => console.log(e));
+                        }}
+                    >
                         Register and Login
                     </Button>
                 </div>

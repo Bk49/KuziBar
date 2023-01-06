@@ -13,9 +13,11 @@ import CreateLotteryItemCard from "../../components/lottery/card/CreateLotteryIt
 import calcDropRate from "../../functions/calcDropRate";
 import TextButton from "../../components/common/button/TextButton";
 import instance from "../../axios/config";
+import { publishLottery } from "../../axios/lotteryAPI";
 
 const CreateLotteryPage = () => {
     const lotteryObj = useSelector((state) => state.lottery);
+    const authObj = useSelector((state) => state.auth);
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [dropRate, setDropRate] = useState([
@@ -50,6 +52,7 @@ const CreateLotteryPage = () => {
             }
         }
     };
+
     useEffect(() => {
         setDropRate(calcDropRate(lotteryObj.lottery_items));
     }, [lotteryObj.lottery_items]);
@@ -102,7 +105,7 @@ const CreateLotteryPage = () => {
                                             dispatch(
                                                 setLotteryVal({
                                                     key: "price",
-                                                    value: value,
+                                                    value: parseInt(value),
                                                 })
                                             )
                                         }
@@ -157,7 +160,16 @@ const CreateLotteryPage = () => {
                             onClick={submitLottery}
                         />
                         <div style={{ marginLeft: "0.6rem" }}></div>
-                        <TextButton text="Publish Lottery" color="#FCBF49" />
+                        <TextButton
+                            text="Publish Lottery"
+                            color="#FCBF49"
+                            onClick={() => {
+                                publishLottery(lotteryObj)
+                                    .then((res) => console.log(res))
+                                    .then(() => navigate("/"))
+                                    .catch((e) => console.log(e));
+                            }}
+                        />
                     </div>
                 </div>
             </div>
