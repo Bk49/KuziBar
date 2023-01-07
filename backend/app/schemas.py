@@ -1,8 +1,9 @@
 from pydantic import BaseModel
 from typing import Union, List
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, validator
 from bson import ObjectId
 import datetime
+from fastapi import HTTPException
 
 
 class PyObjectId(ObjectId):
@@ -70,9 +71,21 @@ class LotteryItem(BaseModel):
     NFT_address: str = None
     date_to_finalize: Union[datetime.date, None] = None
 
+    @validator('owner_id')
+    def validate_owner_id(cls, value):
+        if len(value) != 24:
+            raise ValueError('owner_id must be 24 characters long')
+        return value
+
 
 class NewItem(LotteryItem):
     lottery_id: str = Field(...)
+
+    @validator('lottery_id')
+    def validate_lottery_id(cls, value):
+        if len(value) != 24:
+            raise ValueError('lottery_id must be 24 characters long')
+        return value
 
 
 class SimpleItem(BaseModel):
@@ -120,6 +133,12 @@ class BaseBaseLottery(BaseModel):
     price: int = Field(...)
     creator_id: str = Field(...)
 
+    @validator('creator_id')
+    def validate_creator_id(cls, value):
+        if len(value) != 24:
+            raise ValueError('creator_id must be 24 characters long')
+        return value
+
 
 class BaseLottery(BaseBaseLottery):
     date_created: Union[datetime.date, None] = None
@@ -159,6 +178,18 @@ class NewTicket(BaseModel):
     lottery_id: str = Field(...)
     user_id: str = Field(...)
     entry_quantity: int = Field(...)
+
+    @validator('lottery_id')
+    def validate_lottery_id(cls, value):
+        if len(value) != 24:
+            raise ValueError('lottery_id must be 24 characters long')
+        return value
+    
+    @validator('user_id')
+    def validate_user_id(cls, value):
+        if len(value) != 24:
+            raise ValueError('user_id must be 24 characters long')
+        return value
 
 
 class Ticket(NewTicket):
