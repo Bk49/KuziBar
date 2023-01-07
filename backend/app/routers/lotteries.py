@@ -25,6 +25,12 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
+router_public = APIRouter(
+    prefix="/lottery",
+    tags=["lottery public"],
+    responses={404: {"description": "Not found"}},
+)
+
 
 @router.post("/", response_description="Add new lottery", response_model=Lottery)
 async def create_lottery(new_lottery: NewLottery):
@@ -50,7 +56,7 @@ async def create_lottery(new_lottery: NewLottery):
     return created_lottery
 
 
-@router.get("/", response_description="List all published lotteries", response_model=List[Lottery])
+@router_public.get("/", response_description="List all published lotteries", response_model=List[Lottery])
 async def read_published_lotteries():
     """Read all published lotteries."""
     lotteries = lottery_db_handler.get_published_lottery()
@@ -62,7 +68,7 @@ async def read_published_lotteries():
     return lotteries
 
 
-@router.get("/{id}", response_description="Get a single lottery", response_model=Lottery)
+@router_public.get("/{id}", response_description="Get a single lottery", response_model=Lottery)
 async def read_lottery(id: str):
     """Retrieve a lottery using its id."""
     if (lottery := lottery_db_handler.get_one(ObjectId(id))) is not None:
@@ -75,7 +81,7 @@ async def read_lottery(id: str):
                         detail=f"Lottery {id} not found")
 
 
-@router.get("/{id}/items", response_description="Get the items of a lottery", response_model=List[LotteryItem])
+@router_public.get("/{id}/items", response_description="Get the items of a lottery", response_model=List[LotteryItem])
 async def read_lottery_items(id: str):
     if (lottery := lottery_db_handler.get_one(ObjectId(id))) is None:
         logger.error(f"Lottery id {id} not found, items not returned.")

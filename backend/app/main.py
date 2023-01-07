@@ -49,6 +49,7 @@ app.include_router(users.router)
 app.include_router(lotteries.router)
 app.include_router(ticket.router)
 app.include_router(item.router)
+app.include_router(lotteries.router_public)
 
 
 @app.get("/")
