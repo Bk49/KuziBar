@@ -3,8 +3,10 @@ from fastapi.encoders import jsonable_encoder
 from ..auth import Authenticator
 from ..databases.ticket_db import Ticket_DB_handler
 from ..databases.lottery_db import Lottery_DB_handler
+from ..databases.item_db import Item_DB_handler
 from ..log import Logger
-from ..schemas import NewTicket, Ticket
+from ..schemas import NewTicket, Ticket, Item
+from ..lottery_spin import lottery
 from datetime import date
 from typing import List
 
@@ -12,6 +14,8 @@ from typing import List
 authenticator = Authenticator()
 ticket_db_handler = Ticket_DB_handler()
 lottery_db_handler = Lottery_DB_handler()
+item_db_handler = Item_DB_handler()
+
 logger = Logger("ticket")
 
 # router definition
@@ -69,3 +73,41 @@ async def read_tickets():
     tickets = ticket_db_handler.get_all()
     logger.info(f"Successfully read all tickets.")
     return tickets
+
+
+@router.get("/use_ticket", response_description="Use one ticket", response_model=Item)
+async def use_ticket(lottery_id: str, user_id: str):
+    if (ticket := ticket_db_handler.get_one(lottery_id, user_id)) is not None:
+        logger.info(
+            f"Successfully read ticket by lottery id and user id, proceed to use ticket.")
+        prize = spin_lottery(lottery_id, user_id)
+        logger.info(f"PRIZE IS {str(prize)}")
+        item = item_db_handler.get_one(prize["_id"])
+
+        logger.info(f"Successfully used ticket.")
+        return item
+
+    logger.error(f"Failed to get ticket.")
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                        detail=f"Failed to use ticket of {user_id} on lottery {lottery_id}.")
+
+
+def spin_lottery(lottery_id, user_id=None):
+    while True:
+        # spin lottery
+        tier = lottery()
+
+        if tier < 5:
+            # check if can get from database
+            prize = item_db_handler.get_item_by_tier_full(lottery_id, tier)
+            if prize:
+                # TODO: change the owner
+                print(prize)
+                return prize
+        else:
+            # random get some other tier
+            prize = item_db_handler.get_low_tier(lottery_id)
+            if prize:
+                # TODO: change the owner
+                print(prize)
+                return prize

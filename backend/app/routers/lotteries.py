@@ -4,7 +4,7 @@ from ..databases.lottery_db import Lottery_DB_handler
 from ..databases.item_db import Item_DB_handler
 from ..databases.user_db import User_DB_handler
 from ..log import Logger
-from ..schemas import Lottery, NewLottery, LotteryItem
+from ..schemas import Lottery, NewLottery, LotteryItem, LotteryData, BaseLottery
 from typing import List
 from fastapi.encoders import jsonable_encoder
 from bson import ObjectId
@@ -22,6 +22,12 @@ router = APIRouter(
     prefix="/lottery",
     tags=["lottery"],
     dependencies=[Depends(authenticator.get_current_user)],
+    responses={404: {"description": "Not found"}},
+)
+
+router_public = APIRouter(
+    prefix="/lottery",
+    tags=["lottery public"],
     responses={404: {"description": "Not found"}},
 )
 
@@ -45,11 +51,12 @@ async def create_lottery(new_lottery: NewLottery):
         new_item["lottery_id"] = str(lottery.inserted_id)
         item_db_handler.add_one(new_item)
 
-    logger.info(f"Successfully created new lottery, id: {str(lottery.inserted_id)}")
+    logger.info(
+        f"Successfully created new lottery, id: {str(lottery.inserted_id)}")
     return created_lottery
 
 
-@router.get("/", response_description="List all published lotteries", response_model=List[Lottery])
+@router_public.get("/", response_description="List all published lotteries", response_model=List[Lottery])
 async def read_published_lotteries():
     """Read all published lotteries."""
     lotteries = lottery_db_handler.get_published_lottery()
@@ -61,7 +68,7 @@ async def read_published_lotteries():
     return lotteries
 
 
-@router.get("/{id}", response_description="Get a single lottery", response_model=Lottery)
+@router_public.get("/{id}", response_description="Get a single lottery", response_model=Lottery)
 async def read_lottery(id: str):
     """Retrieve a lottery using its id."""
     if (lottery := lottery_db_handler.get_one(ObjectId(id))) is not None:
@@ -74,8 +81,8 @@ async def read_lottery(id: str):
                         detail=f"Lottery {id} not found")
 
 
-@router.get("/{id}/items", response_description="Get the items of a lottery", response_model=List[LotteryItem])
-async def read_lottery(id: str):
+@router_public.get("/{id}/items", response_description="Get the items of a lottery", response_model=List[LotteryItem])
+async def read_lottery_items(id: str):
     if (lottery := lottery_db_handler.get_one(ObjectId(id))) is None:
         logger.error(f"Lottery id {id} not found, items not returned.")
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
@@ -86,6 +93,35 @@ async def read_lottery(id: str):
 
     logger.info(f"Lottery id {id} found, returned all items.")
     return items
+
+
+@router.get("/{id}/ten_items", response_description="Get the top 10 items of a lottery", response_model=List[LotteryItem])
+async def read_10_lottery_items(id: str):
+    if (lottery := lottery_db_handler.get_one(ObjectId(id))) is None:
+        logger.error(f"Lottery id {id} not found, items not returned.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail=f"Lottery {id} not found")
+
+    # get top 10 items of the lottery
+    items = item_db_handler.get_10_items(id)
+
+    logger.info(f"Lottery id {id} found, returned top 10 items.")
+    return items
+
+
+@router.put("/{id}", response_model=LotteryData)
+async def update_lottery(lottery_id: str, lottery: BaseLottery):
+    update_item_encoded = jsonable_encoder(lottery)
+    
+    updated_lottery = lottery_db_handler.put_one(ObjectId(lottery_id), update_item_encoded)
+
+    if updated_lottery is None:
+        logger.error(f"Lottery id {id} was not updated.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail=f"Lottery {id} was not updated.")
+
+    logger.info(f"Successfully updated lottery, id: {lottery_id}")
+    return updated_lottery
 
 
 def postprocess_lottery(lottery):
