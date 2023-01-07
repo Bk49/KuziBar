@@ -103,7 +103,7 @@ async def read_10_lottery_items(id: str):
                             detail=f"Lottery {id} not found")
 
     # get top 10 items of the lottery
-    items = item_db_handler.get_10_items(id)
+    items = item_db_handler.get_top_ten(id)
 
     logger.info(f"Lottery id {id} found, returned top 10 items.")
     return items
@@ -126,12 +126,12 @@ async def update_lottery(lottery_id: str, lottery: BaseLottery):
 
 def postprocess_lottery(lottery):
     """Post process lottery document returned from database to include more info."""
-    possible_drops = []
-    for i in range(3):
-        drop = item_db_handler.get_item_by_tier(str(lottery['_id']), i+1)
-        if drop is not None:
-            possible_drops.append(drop)
-    lottery['possible_drops'] = possible_drops
+    # possible_drops = []
+    # for i in range(3):
+    #     drop = item_db_handler.get_item_by_tier(str(lottery['_id']), i+1)
+    #     if drop is not None:
+    #         possible_drops.append(drop)
+    lottery['possible_drops'] = item_db_handler.get_top_three(str(lottery['_id']))
 
     # add creator name
     user = user_db_handler.get_one(ObjectId(lottery['creator_id']))
