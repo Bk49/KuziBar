@@ -26,8 +26,6 @@ const getUserId = async () => {
             {},
             {
                 headers: {
-                    withCredentials: true,
-                    "Content-Type": "application/json",
                     accept: "application/json",
                 },
             }
