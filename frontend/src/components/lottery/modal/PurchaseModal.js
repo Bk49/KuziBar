@@ -6,8 +6,9 @@ import { Grid, Modal, Header, Button, Form } from "semantic-ui-react";
 import TextButton from "../../common/button/TextButton";
 import TextInput from "../../common/input/TextInput";
 import "../../../assets/css/components/lottery/modal/PurchaseModal.css";
+import { buyTicket } from "../../../axios/ticketAPI";
 
-const PurchaseModal = ({ lotteryObj }) => {
+const PurchaseModal = ({ navigate, lotteryObj }) => {
     const [open, setOpen] = useState(false);
     const [quantity, setQuantity] = useState(1);
 
@@ -76,7 +77,17 @@ const PurchaseModal = ({ lotteryObj }) => {
                 <Button secondary onClick={() => setOpen(false)}>
                     Cancel
                 </Button>
-                <Button color="green">Confirm Purchase</Button>
+                <Button
+                    onClick={() => {
+                        buyTicket(lotteryObj.lottery_id, quantity)
+                            .then(({ data }) => console.log(data))
+                            .then(() => navigate("/"))
+                            .catch((e) => console.log(e));
+                    }}
+                    color="green"
+                >
+                    Confirm Purchase
+                </Button>
             </Modal.Actions>
         </Modal>
     );
