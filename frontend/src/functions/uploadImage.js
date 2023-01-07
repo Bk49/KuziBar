@@ -24,7 +24,6 @@ const uploadImage = async (images) => {
         );
         // const buf = base64.replace(/^data:image\/\w+;base64,/, "")
         const mime = base64.match(/data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/);
-        console.log("HERE ARE THE STUFFS", imageUrl, buf, mime[1]);
         await s3
             .upload({
                 Bucket: "mochi-bucket",

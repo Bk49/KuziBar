@@ -3,18 +3,21 @@ import { Card, Grid, Icon } from "semantic-ui-react";
 import LotteryCardItemImage from "../../common/image/LotteryCardItemImage";
 import "../../../assets/css/components/lottery/card/LotteryCard.css";
 
-const LotteryCard = ({ lotteryObj }) => {
+const LotteryCard = ({ onClick, lotteryObj }) => {
     return (
-        <Card style={{ overflow: "hidden" }}>
+        <Card
+            onClick={onClick}
+            style={{ overflow: "hidden", marginBottom: "2rem" }}
+        >
             <div className="lottery-card-image-section-container">
                 <div className="lottery-card-creator-container">
                     <div className="lottery-card-creator-initial-container">
                         <span className="lottery-card-creator-initial-text">
-                            {lotteryObj.owner_name[0]}
+                            {lotteryObj.creator_name[0]}
                         </span>
                     </div>
                     <span className="lottery-card-creator-owner-name">
-                        {lotteryObj.owner_name}
+                        {lotteryObj.creator_name}
                     </span>
                 </div>
                 <div className="lottery-card-image-gradient">
@@ -25,7 +28,13 @@ const LotteryCard = ({ lotteryObj }) => {
                     />
                 </div>
             </div>
-            <Card.Content style={{ border: "none", paddingTop: "0.8rem", paddingBottom:"0.3rem" }}>
+            <Card.Content
+                style={{
+                    border: "none",
+                    paddingTop: "0.8rem",
+                    paddingBottom: "0.3rem",
+                }}
+            >
                 <Card.Header>{lotteryObj.lottery_name}</Card.Header>
                 <Card.Meta>Created in {lotteryObj.date_created}</Card.Meta>
                 <Card.Description>
@@ -37,11 +46,8 @@ const LotteryCard = ({ lotteryObj }) => {
                             {lotteryObj.possible_drops
                                 .slice(0, 3)
                                 .map(({ image }, index) => (
-                                    <Grid.Column>
-                                        <LotteryCardItemImage
-                                            key={index}
-                                            image={image}
-                                        />
+                                    <Grid.Column key={index}>
+                                        <LotteryCardItemImage image={image} />
                                     </Grid.Column>
                                 ))}
                         </Grid.Row>
