@@ -7,6 +7,7 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "@zilliqa-js/zilliqa": "^3.3.4",
     "aws-sdk": "^2.1288.0",
     "axios": "^1.2.1",
     "buffer": "^6.0.3",
@@ -17,7 +18,7 @@
     "react-redux": "^8.0.5",
     "react-router": "^6.6.0",
     "react-router-dom": "^6.6.0",
-    "react-scripts": "5.0.1",
+    "react-scripts": "4.0.3",
     "semantic-ui-css": "^2.5.0",
     "semantic-ui-react": "^2.1.4",
     "web-vitals": "^2.1.4"
@@ -59,18 +60,6 @@
     ]
   },
   "devDependencies": {
-    "@storybook/addon-actions": "^6.5.15",
-    "@storybook/addon-essentials": "^6.5.15",
-    "@storybook/addon-interactions": "^6.5.15",
-    "@storybook/addon-links": "^6.5.15",
-    "@storybook/builder-webpack5": "^6.5.15",
-    "@storybook/manager-webpack5": "^6.5.15",
-    "@storybook/node-logger": "^6.5.15",
-    "@storybook/preset-create-react-app": "^4.1.2",
-    "@storybook/react": "^6.5.15",
-    "@storybook/testing-library": "^0.0.13",
-    "babel-plugin-named-exports-order": "^0.0.2",
-    "prop-types": "^15.8.1",
-    "webpack": "^5.75.0"
+    "prop-types": "^15.8.1"
   }
 }

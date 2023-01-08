@@ -14,6 +14,51 @@ const NavBar = ({ currentPage }) => {
     const navigate = useNavigate();
     const [userEmail, setUserEmail] = useState("");
     const [update, setUpdate] = useState(0);
+    const [zilWallet, setZilWallet] = useState("");
+    const [zilUpdate, setZilUpdate] = useState(0);
+
+    const getCurrentAccount = () => {
+        window.zilPay.wallet.connect().then((connected) => {
+            console.log(connected);
+            console.log(window.zilPay.wallet.net);
+            console.log(window.zilPay.wallet.defaultAccount);
+
+            // subscribe to network changes
+            window.zilPay.wallet.observableNetwork().subscribe((network) => {
+                console.log("Network has been changed to " + network);
+            });
+
+            // subscribe to user account changes
+            window.zilPay.wallet.observableAccount().subscribe((account) => {
+                console.log(
+                    "Account has been changed to " +
+                        account.base16 +
+                        " (" +
+                        account.bech32 +
+                        ")"
+                );
+                if (localStorage.getItem("zil_address"))
+                    localStorage.removeItem("zil_addrss");
+                localStorage.setItem("zil_address", [
+                    account.base16,
+                    account.bech32,
+                ]);
+                window.zilPay.blockchain
+                    .getBalance(account.bech32)
+                    .then((data) => {
+                        const zil =
+                            (
+                                data["result"]["balance"] / 1000000000000
+                            ).toString() + " Zil";
+                        console.log(zil);
+                        if (localStorage.getItem("zil_wallet"))
+                            localStorage.removeItem("zil_wallet");
+                        localStorage.setItem("zil_wallet", zil);
+                        setZilWallet(zil);
+                    });
+            });
+        });
+    };
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -24,6 +69,16 @@ const NavBar = ({ currentPage }) => {
             setUserEmail("");
         }
     }, [update]);
+
+    useEffect(() => {
+        const zil = localStorage.getItem("zil_wallet");
+        console.log(zil);
+        if (zil) {
+            setZilWallet(zil);
+        } else {
+            setZilWallet("");
+        }
+    }, setZilUpdate);
 
     return (
         <div className="nav-container">
@@ -55,37 +110,44 @@ const NavBar = ({ currentPage }) => {
                     />
                     <span className="nav-text">Inventory</span>
                 </div>
+
                 <div className="right-container">
-                    <div className="button-container">
-                        <TextIconButton
-                            text="Connect Wallet"
-                            Icon={WalletIcon}
+                    <TextIconButton
+                        text={
+                            zilWallet && zilWallet.length > 0
+                                ? zilWallet
+                                : "Connect Wallet"
+                        }
+                        Icon={WalletIcon}
+                        onClick={() => {
+                            getCurrentAccount();
+                        }}
+                    />
+                </div>
+
+                <div className="button-container">
+                    {userEmail && userEmail.length > 0 ? (
+                        <div
+                            onClick={() => {
+                                if (localStorage.getItem("token"))
+                                    localStorage.removeItem("token");
+                                if (localStorage.getItem("userId"))
+                                    localStorage.removeItem("userId");
+                                setUpdate((prev) => ++prev);
+                            }}
+                            className="user-initial-container"
+                        >
+                            <span className="user-initial-text">
+                                {userEmail[0]}
+                            </span>
+                        </div>
+                    ) : (
+                        <TextButton
+                            onClick={() => navigate("/login")}
+                            text="Login"
+                            color="#F77F00"
                         />
-                    </div>
-                    <div className="button-container">
-                        {userEmail && userEmail.length > 0 ? (
-                            <div
-                                onClick={() => {
-                                    if (localStorage.getItem("token"))
-                                        localStorage.removeItem("token");
-                                    if (localStorage.getItem("userId"))
-                                        localStorage.removeItem("userId");
-                                    setUpdate((prev) => ++prev);
-                                }}
-                                className="user-initial-container"
-                            >
-                                <span className="user-initial-text">
-                                    {userEmail[0]}
-                                </span>
-                            </div>
-                        ) : (
-                            <TextButton
-                                onClick={() => navigate("/login")}
-                                text="Login"
-                                color="#F77F00"
-                            />
-                        )}
-                    </div>
+                    )}
                 </div>
             </div>
         </div>

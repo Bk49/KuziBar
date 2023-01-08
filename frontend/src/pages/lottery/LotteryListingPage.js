@@ -6,6 +6,8 @@ import TextButton from "../../components/common/button/TextButton";
 import NavBar from "../../components/common/nav/NavBar";
 import LotteryCard from "../../components/lottery/card/LotteryCard";
 
+const { Zilliqa } = require("@zilliqa-js/zilliqa");
+
 const LotteryListingPage = () => {
     const [lotteries, setLotteries] = useState([]);
     const navigate = useNavigate();
@@ -33,8 +35,7 @@ const LotteryListingPage = () => {
                                             if (lottery._id) {
                                                 navigate("/lottery-details", {
                                                     state: {
-                                                        lottery_id:
-                                                            lottery._id,
+                                                        lottery_id: lottery._id,
                                                     },
                                                 });
                                             }
@@ -51,8 +52,8 @@ const LotteryListingPage = () => {
                 <div
                     style={{
                         width: "100%",
-                        display:"flex",
-                        flexDirection:"row-reverse",
+                        display: "flex",
+                        flexDirection: "row-reverse",
                         position: "sticky",
                     }}
                 >
