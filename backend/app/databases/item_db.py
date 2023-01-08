@@ -1,6 +1,6 @@
 from app.databases.db import DB_handler
-from ..schemas import SimpleItem
-import random
+# from ..schemas import SimpleItem
+# import random
 
 
 class Item_DB_handler(DB_handler):
@@ -122,3 +122,15 @@ class Item_DB_handler(DB_handler):
 
         items = self.collection.find(filter).sort('tier').limit(limit)
         return list(items)
+
+    def delete_lottery_item(self, lottery_id: str):
+        """Delete all lottery item."""
+        filter = {"lottery_id": lottery_id}
+        
+        self.collection.delete_many(filter)
+
+        count = self.collection.count_documents(filter)
+        if count == 0:
+            return True
+        else:
+            raise False

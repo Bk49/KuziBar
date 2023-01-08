@@ -73,7 +73,7 @@ class LotteryItem(BaseModel):
 
     @validator('owner_id')
     def validate_owner_id(cls, value):
-        if len(value) != 24:
+        if not value is None and len(value) != 24:
             raise ValueError('owner_id must be 24 characters long')
         return value
 

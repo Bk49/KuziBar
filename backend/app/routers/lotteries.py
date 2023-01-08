@@ -110,18 +110,54 @@ async def read_10_lottery_items(id: str):
 
 
 @router.put("/{id}", response_model=LotteryData)
-async def update_lottery(lottery_id: str, lottery: BaseLottery):
-    update_item_encoded = jsonable_encoder(lottery)
-    
-    updated_lottery = lottery_db_handler.put_one(ObjectId(lottery_id), update_item_encoded)
+async def update_lottery(lottery_id: str, lottery: NewLottery):
+    lottery = jsonable_encoder(lottery)
+    items = lottery["lottery_items"]
+    del lottery['lottery_items']
+
+    # append date
+    lottery['date_created'] = str(date.today())
+
+    # delete old item
+    delete_status = item_db_handler.delete_lottery_item(lottery_id)
+    if not delete_status:
+        logger.error(f"Item with lottery id {id} was not all deleted.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail=f"Item with lottery id {id} was not all deleted.")
+    logger.info(
+        f"Successfully deleted all old items of lottery_id {lottery_id}.")
+
+    # create new items
+    for item in items:
+        item["lottery_id"] = lottery_id
+        item_db_handler.add_one(item)
+
+    # update lottery
+    updated_lottery = lottery_db_handler.put_one(ObjectId(lottery_id), lottery)
 
     if updated_lottery is None:
         logger.error(f"Lottery id {id} was not updated.")
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail=f"Lottery {id} was not updated.")
 
-    logger.info(f"Successfully updated lottery, id: {lottery_id}")
+    logger.info(
+        f"Successfully updated lottery, id: {lottery_id}")
     return updated_lottery
+
+
+# @router.put("/{id}", response_model=LotteryData)
+# async def update_lottery(lottery_id: str, lottery: BaseLottery):
+#     update_item_encoded = jsonable_encoder(lottery)
+
+#     updated_lottery = lottery_db_handler.put_one(ObjectId(lottery_id), update_item_encoded)
+
+#     if updated_lottery is None:
+#         logger.error(f"Lottery id {id} was not updated.")
+#         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+#                             detail=f"Lottery {id} was not updated.")
+
+#     logger.info(f"Successfully updated lottery, id: {lottery_id}")
+#     return updated_lottery
 
 
 def postprocess_lottery(lottery):
@@ -131,7 +167,8 @@ def postprocess_lottery(lottery):
     #     drop = item_db_handler.get_item_by_tier(str(lottery['_id']), i+1)
     #     if drop is not None:
     #         possible_drops.append(drop)
-    lottery['possible_drops'] = item_db_handler.get_top_three(str(lottery['_id']))
+    lottery['possible_drops'] = item_db_handler.get_top_three(
+        str(lottery['_id']))
 
     # add creator name
     user = user_db_handler.get_one(ObjectId(lottery['creator_id']))
