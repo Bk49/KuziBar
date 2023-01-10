@@ -145,6 +145,34 @@ async def update_lottery(lottery_id: str, lottery: NewLottery):
     return updated_lottery
 
 
+@router.delete("/{id}", response_description="Delete a draft lottery")
+async def delete_draft_lottery(id: str):
+    if (lottery := lottery_db_handler.get_one(ObjectId(id))) is None:
+        logger.error(f"Lottery id {id} does not exist.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail=f"Lottery id {id} does not exist.")
+
+    # check draft
+    if lottery["status"] == 0:
+        # delete items
+        result = item_db_handler.delete_lottery_item(ObjectId(id))
+        if not result: 
+            logger.error(f"Items of lottery id {id} was not properly deleted.")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Items of lottery id {id} was not properly deleted.")
+        
+        # delete lottery
+        result = lottery_db_handler.delete_lottery(ObjectId(id))
+        if not result:
+            logger.error(f"Lottery id {id} was not properly deleted.")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Lottery id {id} was not properly deleted.")
+
+    else:
+        logger.error(f"Lottery id {id} is not drafted.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Lottery id {id} is not drafted.")
+ 
+    logger.info(f"Successfully deleted lottery id {id} found.")
+    return {"message": "Lottery deleted"}
+
 # @router.put("/{id}", response_model=LotteryData)
 # async def update_lottery(lottery_id: str, lottery: BaseLottery):
 #     update_item_encoded = jsonable_encoder(lottery)

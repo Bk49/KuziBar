@@ -34,5 +34,13 @@ class Lottery_DB_handler(DB_handler):
     def get_user_lottery_drafts(self, user_id: str):
         """Get the drafted lotteries by user_id."""
         return self.collection.find({'creator_id': user_id, 'status': 0})
+
+    def delete_lottery(self, lottery_id: str):
+        """Delete a lottery."""
+        result = self.collection.delete_one({'_id': lottery_id})
+        if result.deleted_count == 0:
+            return False
+        else:
+            return True
     
     

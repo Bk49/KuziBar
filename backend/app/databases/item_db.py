@@ -1,4 +1,6 @@
 from app.databases.db import DB_handler
+from datetime import date, timedelta
+from bson import ObjectId
 # from ..schemas import SimpleItem
 # import random
 
@@ -20,7 +22,7 @@ class Item_DB_handler(DB_handler):
 
     def get_lottery_items(self, lottery_id: str):
         """Get all items of a lottery."""
-        filter = {"lottery_id": lottery_id}
+        filter = {"lottery_id": lottery_id, "owner_id": None}
 
         return list(self.collection.find(filter))
 
@@ -35,7 +37,8 @@ class Item_DB_handler(DB_handler):
         filter = {
             "owner_id": user_id,
             "skin": {"$ne": []},
-            "date_to_finalize": None
+            "date_to_finalize": None,
+            "confirm_skin": False
         }
 
         return list(self.collection.find(filter))
@@ -84,6 +87,7 @@ class Item_DB_handler(DB_handler):
         """Get a random item that is not in high tier"""
         condition = [
             {"$match": {"lottery_id": lottery_id,
+                        "$or": [{"owner_id": None}, {"owner_id": ""}],
                         "tier": {"$nin": [1, 2, 3, 4]}}},
             {"$sample": {"size": 1}}
         ]
@@ -107,16 +111,28 @@ class Item_DB_handler(DB_handler):
         except StopIteration:
             return None
 
+    def get_item_by_tier_not_owned(self, lottery_id: str, item_tier: int):
+        """Get high tier drop."""
+        pipeline = [{"$match": {"tier": item_tier, "$or": [{"owner_id": None}, {"owner_id": ""}], "lottery_id": lottery_id}}, {
+            "$sample": {"size": 1}}]
+
+        try:
+            cursor = self.collection.aggregate(pipeline, allowDiskUse=True)
+            document = cursor.next()
+            return document
+        except StopIteration:
+            return None
+
     def get_top_three(self, lottery_id: str):
         """Get top 3 items from a lottery."""
         filter = {"lottery_id": lottery_id}
         items = self.collection.find(filter).sort('tier').limit(3)
         return list(items)
-    
+
     def get_top_ten(self, lottery_id: str):
         """Get top 10 items from a lottery."""
         filter = {"lottery_id": lottery_id}
-        
+
         count = self.collection.count_documents(filter)
         limit = min(10, count)
 
@@ -126,7 +142,7 @@ class Item_DB_handler(DB_handler):
     def delete_lottery_item(self, lottery_id: str):
         """Delete all lottery item."""
         filter = {"lottery_id": lottery_id}
-        
+
         self.collection.delete_many(filter)
 
         count = self.collection.count_documents(filter)
@@ -134,3 +150,36 @@ class Item_DB_handler(DB_handler):
             return True
         else:
             raise False
+
+    def update_prize(self, item_id: str, user_id: str):
+        """Update won prize."""
+        filter = {'_id': item_id}
+        update = {'$set': {"confirm_skin": False, 'owner_id': user_id,
+                           "date_to_finalize": str(date.today() + timedelta(days=30))}}
+
+        result = self.collection.update_one(filter, update)
+        if result.acknowledged:
+            return True
+        else:
+            return False
+
+    def select_skin(self, item_id: ObjectId, image_url: str):
+        """Update selected skin."""
+        document = self.collection.find_one({"_id": item_id,"skins.skin_image": image_url})
+        try:
+            ori_name = document["item_name"]
+            for item in document["skins"]:
+                if item["skin_image"] == image_url:
+                    skin_name = item["skin_name"]
+                    break
+        except Exception:
+            return False
+
+        query = {'_id': item_id}
+        update = {"$set": {"confirm_skin": True, "image": image_url, "item_name": ori_name + f" ({skin_name})"}}
+
+        result = self.collection.update_one(query, update)
+        if result.acknowledged:
+            return True
+        else:
+            return False
