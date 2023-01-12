@@ -32,4 +32,20 @@ const getUserInventory = async (userId, type) => {
     }
 };
 
-export { getUserInventory };
+const selectSkin = async (item_id, skin_image) => {
+    try {
+        return await authInstance.put(
+            `/item/customisation?item_id=${item_id}&skin_image=${skin_image}`,
+            {},
+            {
+                headers: {
+                    accept: "application/json",
+                },
+            }
+        );
+    } catch (e) {
+        throw e;
+    }
+};
+
+export { getUserInventory, selectSkin };
