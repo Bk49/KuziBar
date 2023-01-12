@@ -3,7 +3,7 @@ import { authInstance } from "./config";
 const buyTicket = async (lotteryId, quantity) => {
     try {
         const userId = localStorage.getItem("userId");
-        if (!userId) throw "userId is not set in the localStorage";
+        if (!userId) throw new Error("userId is not set in the localStorage");
         return await authInstance.post(
             `/ticket`,
             {
