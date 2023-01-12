@@ -11,13 +11,14 @@ import { Header } from "semantic-ui-react";
 import TextButton from "../../components/common/button/TextButton";
 import { useState } from "react";
 import ConfirmationModal from "../../components/common/modal/ConfirmationModal";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import {
     addLotteryItem,
     editLotteryItem,
 } from "../../redux/slice/lotterySlice";
 
-const EditAddItemPage = ({ edit }) => {
+const EditAddItemPage = ({ edit, to }) => {
+    const { state } = useLocation();
     const itemState = useSelector((state) => state.item);
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -141,10 +142,21 @@ const EditAddItemPage = ({ edit }) => {
                         color="#F77F00"
                         text={`Save ${edit ? "Changes" : "Item"}`}
                         onClick={() => {
+                            console.log(itemState);
                             if (edit) dispatch(editLotteryItem(itemState));
                             else dispatch(addLotteryItem(itemState));
                             dispatch(reset());
-                            navigate("/create-lottery");
+                            navigate(
+                                to,
+                                to === "/inventory/edit-lottery"
+                                    ? {
+                                          state: {
+                                              r: true,
+                                              lottery_id: state.lottery_id,
+                                          },
+                                      }
+                                    : {}
+                            );
                         }}
                     />
                     <div style={{ marginRight: "15px" }}></div>
@@ -168,7 +180,17 @@ const EditAddItemPage = ({ edit }) => {
                         onClick={() => {
                             setOpen(false);
                             dispatch(reset());
-                            navigate("/create-lottery");
+                            navigate(
+                                to,
+                                to === "/inventory/edit-lottery"
+                                    ? {
+                                          state: {
+                                              r: true,
+                                              lottery_id: state.lottery_id,
+                                          },
+                                      }
+                                    : {}
+                            );
                         }}
                     >
                         Discard Changes

@@ -26,9 +26,19 @@ const LotteryTicketCard = ({ lotteryObj, ...rest }) => {
                     />
                 </div>
             </div>
-            <Card.Content style={{ border: "none", paddingTop: "0.8rem", paddingBottom:"0.3rem" }}>
-                <Card.Header>{lotteryObj.lottery_name + " (Ticket)"}</Card.Header>
-                <Card.Meta>Owned Quantity: {lotteryObj.ticket_quantity}</Card.Meta>
+            <Card.Content
+                style={{
+                    border: "none",
+                    paddingTop: "0.8rem",
+                    paddingBottom: "0.3rem",
+                }}
+            >
+                <Card.Header>
+                    {lotteryObj.lottery_name + " (Ticket)"}
+                </Card.Header>
+                <Card.Meta>
+                    Owned Quantity: {lotteryObj.ticket_quantity}
+                </Card.Meta>
                 <Card.Description>
                     <span className="lottery-ticket-card-possible-drop-text">
                         Possible Drops

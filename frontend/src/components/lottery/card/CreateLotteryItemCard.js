@@ -4,14 +4,13 @@ import { Grid, Card, Label, Header, Icon } from "semantic-ui-react";
 import { setItem } from "../../../redux/slice/itemSlice";
 import { deleteLotteryItem } from "../../../redux/slice/lotterySlice";
 import handleColor from "../../../functions/handleColor";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router";
 
-const CreateLotteryItemCard = ({
-    index,
-    lotteryObj,
-    dropRate,
-    dispatch,
-    navigate,
-}) => {
+const CreateLotteryItemCard = ({ index, lotteryObj, edit }) => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
     return (
         <Grid.Column style={{ marginTop: "1rem" }}>
             <Card
@@ -63,7 +62,19 @@ const CreateLotteryItemCard = ({
                                                     })
                                                 );
                                                 navigate(
-                                                    "/create-lottery/edit-item"
+                                                    `/${
+                                                        edit
+                                                            ? "inventory/edit-lottery"
+                                                            : "create-lottery"
+                                                    }/edit-item`,
+                                                    edit
+                                                        ? {
+                                                              state: {
+                                                                  lottery_id:
+                                                                      lotteryObj.lottery_id,
+                                                              },
+                                                          }
+                                                        : {}
                                                 );
                                             }}
                                         >
@@ -81,7 +92,7 @@ const CreateLotteryItemCard = ({
                                                 {lotteryObj.lottery_items[
                                                     index
                                                 ].skins.map((skin, skinI) => (
-                                                    <li>
+                                                    <li key={skinI}>
                                                         {
                                                             lotteryObj
                                                                 .lottery_items[
@@ -98,12 +109,6 @@ const CreateLotteryItemCard = ({
                                                 <br />
                                             </>
                                         )}
-                                        {`Drop Rate: ${
-                                            dropRate[
-                                                lotteryObj.lottery_items[index]
-                                                    .tier - 1
-                                            ]
-                                        }%`}
                                     </Card.Description>
                                 </Card.Content>
                                 <div className="create-lottery-item-delete-icon-container">

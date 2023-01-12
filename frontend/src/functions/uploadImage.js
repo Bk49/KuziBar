@@ -27,7 +27,7 @@ const uploadImage = async (images) => {
         await s3
             .upload({
                 Bucket: "mochi-bucket",
-                Key: `${imageUrl}.${mime[1].substring(6)}`,
+                Key: `${imageUrl}`,
                 ContentEncoding: "base64",
                 Body: buf,
                 ContentType: mime[1],
