@@ -157,6 +157,7 @@ class LotteryData(BaseLottery):
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 
+
 class NewLottery(BaseLottery):
     lottery_items: Union[List[LotteryItem], None] = []
 
@@ -187,7 +188,7 @@ class NewTicket(BaseModel):
         if len(value) != 24:
             raise ValueError('lottery_id must be 24 characters long')
         return value
-    
+
     @validator('user_id')
     def validate_user_id(cls, value):
         if len(value) != 24:
@@ -219,3 +220,7 @@ class LotteryTicket(BaseBaseLottery):
 
 class OwnedItem(Item):
     confirm_skin: bool = False
+
+
+class Item_Creator(Item):
+    creator_name: str

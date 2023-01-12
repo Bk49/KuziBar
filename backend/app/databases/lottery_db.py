@@ -42,5 +42,10 @@ class Lottery_DB_handler(DB_handler):
             return False
         else:
             return True
+
+    def get_creator_id(self, lottery_id: str):
+        """Get the creator id of a lottery."""
+        result = self.collection.find_one({'_id': lottery_id})
+        return result["creator_id"]
     
     

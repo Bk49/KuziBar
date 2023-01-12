@@ -5,7 +5,7 @@ from ..databases.item_db import Item_DB_handler
 from ..databases.lottery_db import Lottery_DB_handler
 from ..databases.ticket_db import Ticket_DB_handler
 from ..log import Logger
-from ..schemas import User, Item, LotteryTicket, Lottery, Ticket
+from ..schemas import User, Item, LotteryTicket, Lottery, Ticket, Item_Creator
 from typing import List
 from bson import ObjectId
 from app.routers.lotteries import postprocess_lottery
@@ -70,7 +70,7 @@ async def read_user_items(id: str):
                         detail=f"Failed to read owned items of user {id}.")
 
 
-@router.get("/{id}/customizable_items", response_model=List[Item])
+@router.get("/{id}/customizable_items", response_model=List[Item_Creator])
 async def read_user_customizable_items(id: str):
     """Read customizable items of a user."""
 
@@ -78,6 +78,9 @@ async def read_user_customizable_items(id: str):
         logger.info(
             f"Successfully read user by id, proceed to retrieve customizable items.")
         custom_items = item_db_handler.get_customizable_items(id)
+
+        for item in custom_items:
+            item["creator_name"] = get_creator_name(item["lottery_id"])
 
         logger.info(f"Successfully get customizable items.")
         return custom_items
@@ -182,3 +185,9 @@ async def read_user_ticket(id: str):
     logger.error(f"Failed to read owned tickets.")
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                         detail=f"Failed to read owned tickets of user {id}.")
+
+
+def get_creator_name(lottery_id: str):
+    """Helper function to get the creator name of an item."""
+    creator_id = lottery_db_handler.get_creator_id(ObjectId(lottery_id))
+    return user_db_handler.get_creator_name(ObjectId(creator_id))
