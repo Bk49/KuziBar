@@ -37,7 +37,6 @@ class Item_DB_handler(DB_handler):
         filter = {
             "owner_id": user_id,
             "skin": {"$ne": []},
-            "date_to_finalize": None,
             "confirm_skin": False
         }
 
