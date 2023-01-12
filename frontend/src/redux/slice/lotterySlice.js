@@ -15,6 +15,7 @@ import { createSlice } from "@reduxjs/toolkit";
 export const lotterySlice = createSlice({
     name: "lottery",
     initialState: {
+        id:"",
         image: "",
         lottery_name: "",
         price: 10.0,
@@ -44,8 +45,13 @@ export const lotterySlice = createSlice({
             currentState.lottery_items.splice(payload.index, 1);
         },
 
+        resetLotteryItems: (currentState) => {
+            currentState.lottery_items = []
+        },
+
         resetLottery: (currentState) => {
             currentState = {
+                id:"",
                 image: "",
                 lottery_name: "",
                 price: 10.0,
@@ -61,7 +67,8 @@ export const {
     addLotteryItem,
     editLotteryItem,
     deleteLotteryItem,
-    resetLotteryItemsId,
+    resetLotteryItems,
+    resetLottery,
 } = lotterySlice.actions;
 
 export default lotterySlice.reducer;
