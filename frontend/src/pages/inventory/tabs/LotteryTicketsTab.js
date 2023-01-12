@@ -5,12 +5,13 @@ import LotteryTicketDetailModal from "../../../components/inventory/modal/Lotter
 
 const LotteryTicketsTab = ({ user }) => {
     const [tickets, setTickets] = useState([]);
+    const [update, setUpdate] = useState(1)
 
     useEffect(() => {
         getUserInventory(user, 2)
             .then(({ data }) => setTickets(data))
             .catch((e) => console.log(e));
-    }, [user]);
+    }, [user, update]);
 
     return (
         <Grid style={{ width: "100%", marginTop: "0" }}>
@@ -21,7 +22,7 @@ const LotteryTicketsTab = ({ user }) => {
                             key={index}
                             style={{ marginBottom: "2rem" }}
                         >
-                            <LotteryTicketDetailModal lotteryObj={ticket} />
+                            <LotteryTicketDetailModal lotteryObj={ticket} setUpdate={setUpdate} />
                         </Grid.Column>
                     ))
                 ) : (

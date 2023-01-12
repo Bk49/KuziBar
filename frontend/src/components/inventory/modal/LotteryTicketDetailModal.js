@@ -3,10 +3,12 @@ import { Modal, Grid, Header, Button, Card } from "semantic-ui-react";
 import LotteryTicketCard from "../card/LotteryTicketCard";
 import "../../../assets/css/components/inventory/modal/LotteryTicketDetailModal.css";
 import handleColor from "../../../functions/handleColor";
+import { useTicket as openTicket } from "../../../axios/ticketAPI";
 
-const LotteryTicketDetailModal = ({ lotteryObj }) => {
+const LotteryTicketDetailModal = ({ lotteryObj, setUpdate }) => {
     const [open, setOpen] = useState(false);
     const [open2, setOpen2] = useState(false);
+    const [result, setResult] = useState({});
 
     return (
         <>
@@ -92,7 +94,13 @@ const LotteryTicketDetailModal = ({ lotteryObj }) => {
                     <Button
                         color="green"
                         onClick={() => {
-                            setOpen2(true);
+                            openTicket(lotteryObj._id)
+                                .then(({ data }) => {
+                                    console.log(data);
+                                    setResult(data);
+                                })
+                                .then(() => setOpen2(true))
+                                .catch((e) => console.log(e));
                         }}
                     >
                         Use Ticket
@@ -102,7 +110,11 @@ const LotteryTicketDetailModal = ({ lotteryObj }) => {
             <Modal
                 closeIcon
                 onOpen={() => setOpen2(true)}
-                onClose={() => setOpen2(false)}
+                onClose={() => {
+                    setUpdate((prev) => ++prev);
+                    setOpen(false);
+                    setOpen2(false);
+                }}
                 open={open2}
             >
                 <Modal.Header>Congratulations! You got...</Modal.Header>
@@ -125,18 +137,23 @@ const LotteryTicketDetailModal = ({ lotteryObj }) => {
                                 <Modal.Description style={{ height: "100%" }}>
                                     {/* To be changed to the item being returned after rolling */}
                                     <Header>
-                                        Mirrorjade the Iceblade Dragon
+                                        {result.item_name
+                                            ? result.item_name
+                                            : "Unknown item"}
                                     </Header>
                                     <p>
                                         Congratulations for obtaining a Tier{" "}
-                                        {"1"} Prize!
+                                        {result.tier ? result.tier : "7"} Prize!
                                     </p>
                                     <p>
                                         You can choose your customizations for
                                         this item in your "Customizable Items"
                                         section of "Inventory" (Customizations)
                                         will also be auto-assigned if not done
-                                        before "SOME RANDOM DATE"
+                                        before{" "}
+                                        {result.date_to_finalize
+                                            ? result.date_to_finalize
+                                            : "Unknown date"}
                                     </p>
                                 </Modal.Description>
                             </Grid.Column>
@@ -147,6 +164,9 @@ const LotteryTicketDetailModal = ({ lotteryObj }) => {
                     <Button
                         color="green"
                         onClick={() => {
+                            setResult({});
+                            setUpdate((prev) => ++prev);
+                            setOpen(false);
                             setOpen2(false);
                         }}
                     >
