@@ -30,11 +30,19 @@ const router = createBrowserRouter([
     },
     {
         path: "create-lottery/add-item",
-        element: <EditAddItemPage edit={false} />,
+        element: <EditAddItemPage edit={false} to="/create-lottery" />,
     },
     {
         path: "create-lottery/edit-item",
-        element: <EditAddItemPage edit={true} />,
+        element: <EditAddItemPage edit={true} to="/create-lottery" />,
+    },
+    {
+        path: "inventory/edit-lottery/add-item",
+        element: <EditAddItemPage edit={false} to="/inventory/edit-lottery" />,
+    },
+    {
+        path: "inventory/edit-lottery/edit-item",
+        element: <EditAddItemPage edit={true} to="/inventory/edit-lottery" />,
     },
     {
         path: "lottery-details", // lottery-details/:lottery_id

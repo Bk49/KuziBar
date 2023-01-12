@@ -1,7 +1,7 @@
 import { Modal, Grid, Header, Form, Button } from "semantic-ui-react";
 import CustomizableItemCard from "../card/CustomizableItemCard";
 import { useState } from "react";
-import "../../../assets/css//components/inventory/modal/CustomizeItemModal.css"
+import "../../../assets/css/components/inventory/modal/CustomizeItemModal.css";
 
 const CustomizeItemModal = ({ item }) => {
     const [open, setOpen] = useState(false);

@@ -1,4 +1,3 @@
-import { config } from "aws-sdk";
 import axios from "axios";
 
 const instance = axios.create({
