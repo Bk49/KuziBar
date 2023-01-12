@@ -17,6 +17,7 @@ const NavBar = ({ currentPage }) => {
     const [zilWallet, setZilWallet] = useState("");
     const [zilUpdate, setZilUpdate] = useState(0);
 
+    // connect to wallet
     const getCurrentAccount = () => {
         window.zilPay.wallet.connect().then((connected) => {
             console.log(connected);
@@ -51,10 +52,10 @@ const NavBar = ({ currentPage }) => {
                                 data["result"]["balance"] / 1000000000000
                             ).toString() + " Zil";
                         console.log(zil);
+                        setZilWallet(zil);
                         if (localStorage.getItem("zil_wallet"))
                             localStorage.removeItem("zil_wallet");
                         localStorage.setItem("zil_wallet", zil);
-                        setZilWallet(zil);
                     });
             });
         });

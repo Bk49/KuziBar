@@ -74,6 +74,7 @@ const publishLottery = async (lottery) => {
                             const mime = image.match(
                                 /data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/
                             );
+                            console.log("MIME: " + mime);
                             const imgUrl = `lottery/${lottery_name}/${itemName}/${skin_name}${now}${mime[1].substring(
                                 6
                             )}`;
@@ -90,7 +91,7 @@ const publishLottery = async (lottery) => {
                 }
             }
         }
-
+        console.log("base64Imgs: " + base64Imgs);
         await uploadImage(base64Imgs);
         return await authInstance.post(`lottery/`, data, {
             headers: {

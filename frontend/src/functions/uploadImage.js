@@ -22,8 +22,10 @@ const uploadImage = async (images) => {
             base64.replace(/^data:image\/\w+;base64,/, ""),
             "base64"
         );
+        console.log("buffer: " + buf);
         // const buf = base64.replace(/^data:image\/\w+;base64,/, "")
         const mime = base64.match(/data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/);
+        console.log("MIME in upload.js: " + mime);
         await s3
             .upload({
                 Bucket: "mochi-bucket",
