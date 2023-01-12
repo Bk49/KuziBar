@@ -20,7 +20,7 @@ class Ticket_DB_handler(DB_handler):
     
     def get_user_tickets(self, user_id: str):
         """Get the ticket by user_id."""
-        return list(self.collection.find({'user_id': user_id}))
+        return list(self.collection.find({'user_id': user_id, 'entry_quantity': {'$ne': 0}}))
 
     def use_ticket(self, lottery_id: str, user_id: str):
         """Ticket count decrement."""
