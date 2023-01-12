@@ -173,13 +173,10 @@ const EditLotteryPage = () => {
                             text="Save Lottery"
                             color="#F77F00"
                             onClick={() => {
-                                saveLottery(lotteryObj, state.lottery_id).then(
-                                    (res) =>
-                                        console
-                                            .log(res)
-                                            .then(() => navigate("/"))
-                                            .catch((e) => console.log(e))
-                                );
+                                saveLottery(lotteryObj, state.lottery_id)
+                                    .then(({ data }) => console.log(data))
+                                    .then(() => navigate("/"))
+                                    .catch((e) => console.log(e));
                             }}
                         />
                         <div style={{ marginLeft: "0.6rem" }}></div>
@@ -188,7 +185,7 @@ const EditLotteryPage = () => {
                             color="#FCBF49"
                             onClick={() => {
                                 publishLottery(lotteryObj, state.lottery_id)
-                                    .then((res) => console.log(res))
+                                    .then(({ data }) => console.log(data))
                                     .then(() => navigate("/"))
                                     .catch((e) => console.log(e));
                             }}
