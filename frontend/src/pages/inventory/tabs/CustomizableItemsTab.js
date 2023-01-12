@@ -5,12 +5,13 @@ import CustomizableItemModal from "../../../components/inventory/modal/Customize
 
 const CustomizableItemsTab = ({ user }) => {
     const [items, setItems] = useState([]);
+    const [update, setUpdate] = useState(0)
 
     useEffect(() => {
         getUserInventory(user, 1)
             .then(({ data }) => setItems(data))
             .catch((e) => console.log(e));
-    }, [user]);
+    }, [user, update]);
 
     return (
         <Grid style={{ width: "100%", marginTop: "0" }}>
@@ -21,7 +22,7 @@ const CustomizableItemsTab = ({ user }) => {
                             key={index}
                             style={{ marginBottom: "2rem" }}
                         >
-                            <CustomizableItemModal item={item} />
+                            <CustomizableItemModal setUpdate={setUpdate} item={item} />
                         </Grid.Column>
                     ))
                 ) : (
