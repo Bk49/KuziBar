@@ -114,7 +114,7 @@ const publishLottery = async (lottery, lottery_id) => {
 
         await uploadImage(base64Imgs);
         if (lottery_id) {
-            return await authInstance.put(`lottery/${lottery_id}`, data, {
+            return await authInstance.put(`lottery/?lottery_id=${lottery_id}`, data, {
                 headers: {
                     "Content-Type": "application/json",
                     accept: "application/json",
@@ -248,7 +248,7 @@ const saveLottery = async (lottery, lottery_id) => {
 
         await uploadImage(base64Imgs);
         if (lottery_id) {
-            return await authInstance.put(`lottery/${lottery_id}`, data, {
+            return await authInstance.put(`lottery/?lottery_id=${lottery_id}`, data, {
                 headers: {
                     "Content-Type": "application/json",
                     accept: "application/json",
