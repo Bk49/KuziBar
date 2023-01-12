@@ -14,7 +14,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 SECRET_KEY = "d03854461d5fed07d0a11d3af088ee1b2af083cfa237d14f72fc05532b487e12"
 REFRESH_TOKEN_SECRET_KEY = "1562a01a1f4d4ff049643ca43a4ecfbfdc71f3fdea167b8543c28f202f5444d8"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+ACCESS_TOKEN_EXPIRE_MINUTES = 6000
 REFRESH_TOKEN_EXPIRE_MINUTES = 6000
 token_db_handler = Token_DB_handler()
 user_db_handler = User_DB_handler()

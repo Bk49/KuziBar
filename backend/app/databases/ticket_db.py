@@ -21,5 +21,13 @@ class Ticket_DB_handler(DB_handler):
     def get_user_tickets(self, user_id: str):
         """Get the ticket by user_id."""
         return list(self.collection.find({'user_id': user_id}))
+
+    def use_ticket(self, lottery_id: str, user_id: str):
+        """Ticket count decrement."""
+        query = {'lottery_id': lottery_id, 'user_id': user_id}
+        update = {'$inc': {'entry_quantity': -1}}
+
+        # Update the document
+        return self.collection.update_one(query, update)
             
     

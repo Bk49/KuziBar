@@ -73,7 +73,9 @@ class LotteryItem(BaseModel):
 
     @validator('owner_id')
     def validate_owner_id(cls, value):
-        if not value is None and len(value) != 24:
+        if value is None or value == "":
+            return value
+        if len(value) != 24:
             raise ValueError('owner_id must be 24 characters long')
         return value
 
@@ -92,6 +94,7 @@ class SimpleItem(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     item_name: str = Field(...)
     image: str
+    tier: int
 
     class Config:
         allow_population_by_field_name = True
@@ -212,3 +215,7 @@ class LotteryTicket(BaseBaseLottery):
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
+
+
+class OwnedItem(Item):
+    confirm_skin: bool = False

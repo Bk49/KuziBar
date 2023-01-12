@@ -5,10 +5,11 @@ from ..databases.ticket_db import Ticket_DB_handler
 from ..databases.lottery_db import Lottery_DB_handler
 from ..databases.item_db import Item_DB_handler
 from ..log import Logger
-from ..schemas import NewTicket, Ticket, Item
+from ..schemas import NewTicket, Ticket, OwnedItem
 from ..lottery_spin import lottery
 from datetime import date
 from typing import List
+from bson import ObjectId
 
 # variables
 authenticator = Authenticator()
@@ -75,7 +76,7 @@ async def read_tickets():
     return tickets
 
 
-@router.get("/use_ticket", response_description="Use one ticket", response_model=Item)
+@router.get("/use_ticket", response_description="Use one ticket", response_model=OwnedItem)
 async def use_ticket(lottery_id: str, user_id: str):
     if (ticket := ticket_db_handler.get_one(lottery_id, user_id)) is not None:
         logger.info(
@@ -83,6 +84,9 @@ async def use_ticket(lottery_id: str, user_id: str):
         prize = spin_lottery(lottery_id, user_id)
         logger.info(f"PRIZE IS {str(prize)}")
         item = item_db_handler.get_one(prize["_id"])
+
+        # ticket - 1
+        ticket_db_handler.use_ticket(lottery_id, user_id)
 
         logger.info(f"Successfully used ticket.")
         return item
@@ -99,15 +103,28 @@ def spin_lottery(lottery_id, user_id=None):
 
         if tier < 5:
             # check if can get from database
-            prize = item_db_handler.get_item_by_tier_full(lottery_id, tier)
-            if prize:
-                # TODO: change the owner
-                print(prize)
-                return prize
+            prize = item_db_handler.get_item_by_tier_not_owned(lottery_id, tier)
         else:
             # random get some other tier
             prize = item_db_handler.get_low_tier(lottery_id)
-            if prize:
-                # TODO: change the owner
-                print(prize)
-                return prize
+
+        if prize:
+            # update the prize
+            item_id = prize["_id"]
+            result = item_db_handler.update_prize(ObjectId(item_id), user_id)
+            if not result:
+                logger.error("Failed to update won prize.")
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                    detail="Failed to update won prize.")
+            
+            # get the prize
+            new_prize = item_db_handler.get_one(ObjectId(item_id))
+
+            print(new_prize)
+            return new_prize
+
+
+def process_prize(item_id: str, user_id: str):
+    """Post process prize."""
+    # set owner_id
+    return item_db_handler.update_prize(ObjectId(item_id), user_id)
