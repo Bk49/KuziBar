@@ -28,7 +28,7 @@ const LotteryDetailPage = () => {
                 })
                 .catch((e) => console.log(e));
         }
-    }, []);
+    }, [state]);
 
     return (
         <>
