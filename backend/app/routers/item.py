@@ -30,7 +30,7 @@ async def create_item(new_item: NewItem):
     logger.info(f"Successfully created new item, id: {str(item.inserted_id)}")
     return created_item
 
-@router.put("/{id}", response_model=Item)
+@router.put("/", response_model=Item)
 async def update_item(item_id: str, item: NewItem):
     update_item_encoded = jsonable_encoder(item)
     
@@ -45,7 +45,7 @@ async def update_item(item_id: str, item: NewItem):
     return updated_item
 
 
-@router.put("/{id}/customisation", response_model=OwnedItem)
+@router.put("/customisation", response_model=OwnedItem)
 async def select_skin(item_id: str, skin_image: str):
     if (item := item_db_handler.get_one(ObjectId(item_id))) is None:
         logger.error(f"Item id {item_id} does not exist.")
