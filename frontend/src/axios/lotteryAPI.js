@@ -68,7 +68,7 @@ const publishLottery = async (lottery, lottery_id) => {
                         });
                     } else {
                         data.lottery_items.push({
-                            image: image,
+                            image: itemImage,
                             item_name: item_name,
                             tier: tier,
                             skins: [],
@@ -202,7 +202,7 @@ const saveLottery = async (lottery, lottery_id) => {
                         });
                     } else {
                         data.lottery_items.push({
-                            image: image,
+                            image: itemImage,
                             item_name: item_name,
                             tier: tier,
                             skins: [],
