@@ -79,7 +79,11 @@ const PurchaseModal = ({ navigate, lotteryObj }) => {
                 </Button>
                 <Button
                     onClick={() => {
-                        buyTicket(lotteryObj.lottery_id, quantity)
+                        buyTicket(
+                            lotteryObj.lottery_id,
+                            lotteryObj.price,
+                            quantity
+                        )
                             .then(({ data }) => console.log(data))
                             .then(() => navigate("/"))
                             .catch((e) => console.log(e));

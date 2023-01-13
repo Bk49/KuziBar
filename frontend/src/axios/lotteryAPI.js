@@ -111,7 +111,7 @@ const publishLottery = async (lottery, lottery_id) => {
                 }
             }
         }
-
+        console.log("base64Imgs: " + base64Imgs);
         await uploadImage(base64Imgs);
         if (lottery_id) {
             return await authInstance.put(`lottery/?lottery_id=${lottery_id}`, data, {
