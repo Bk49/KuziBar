@@ -1,7 +1,7 @@
 import uploadImage from "../functions/uploadImage";
 import instance, { authInstance } from "./config";
 
-const publishLottery = async (lottery) => {
+const publishLottery = async (lottery, lottery_id) => {
     const now = Date.now();
     const date = new Date();
     const date_created = `${date.getFullYear()}-${
@@ -28,11 +28,13 @@ const publishLottery = async (lottery) => {
             const mime = image.match(
                 /data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/
             );
-            const imgUrl = `lottery/${lottery_name}/lottery_image${now}${mime[1].substring(
-                6
-            )}`;
-            base64Imgs.push({ imageUrl: imgUrl, base64: image });
-            data.image = `${bucketUrl}${imgUrl}`;
+            if (mime) {
+                const imgUrl = `lottery/${lottery_name}/lottery_image${now}.${mime[1].substring(
+                    6
+                )}`;
+                base64Imgs.push({ imageUrl: imgUrl, base64: image });
+                data.image = `${bucketUrl}${imgUrl}`;
+            }
         }
 
         if (lottery_items && lottery_items.length > 0) {
@@ -49,17 +51,29 @@ const publishLottery = async (lottery) => {
                     const mime = image.match(
                         /data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/
                     );
-                    const imgUrl = `lottery/${lottery_name}/${itemName}${now}${mime[1].substring(
-                        6
-                    )}`;
-                    base64Imgs.push({ imageUrl: imgUrl, base64: itemImage });
                     const { item_name, tier } = lottery_items[i];
-                    data.lottery_items.push({
-                        image: `${bucketUrl}${imgUrl}`,
-                        item_name: item_name,
-                        tier: tier,
-                        skins: [],
-                    });
+                    if (mime) {
+                        const imgUrl = `lottery/${lottery_name}/${itemName}${now}.${mime[1].substring(
+                            6
+                        )}`;
+                        base64Imgs.push({
+                            imageUrl: imgUrl,
+                            base64: itemImage,
+                        });
+                        data.lottery_items.push({
+                            image: `${bucketUrl}${imgUrl}`,
+                            item_name: item_name,
+                            tier: tier,
+                            skins: [],
+                        });
+                    } else {
+                        data.lottery_items.push({
+                            image: itemImage,
+                            item_name: item_name,
+                            tier: tier,
+                            skins: [],
+                        });
+                    }
                 }
 
                 if (skins && skins.length > 0) {
@@ -74,18 +88,24 @@ const publishLottery = async (lottery) => {
                             const mime = image.match(
                                 /data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/
                             );
-                            console.log("MIME: " + mime);
-                            const imgUrl = `lottery/${lottery_name}/${itemName}/${skin_name}${now}${mime[1].substring(
-                                6
-                            )}`;
-                            base64Imgs.push({
-                                imageUrl: imgUrl,
-                                base64: skin_image,
-                            });
-                            data.lottery_items[i].skins.push({
-                                skin_name: skin_name,
-                                skin_image: `${bucketUrl}${imgUrl}`,
-                            });
+                            if (mime) {
+                                const imgUrl = `lottery/${lottery_name}/${itemName}/${skin_name}${now}.${mime[1].substring(
+                                    6
+                                )}`;
+                                base64Imgs.push({
+                                    imageUrl: imgUrl,
+                                    base64: skin_image,
+                                });
+                                data.lottery_items[i].skins.push({
+                                    skin_name: skin_name,
+                                    skin_image: `${bucketUrl}${imgUrl}`,
+                                });
+                            } else {
+                                data.lottery_items[i].skins.push({
+                                    skin_name: skin_name,
+                                    skin_image: skin_image,
+                                });
+                            }
                         }
                     }
                 }
@@ -93,19 +113,29 @@ const publishLottery = async (lottery) => {
         }
         console.log("base64Imgs: " + base64Imgs);
         await uploadImage(base64Imgs);
-        return await authInstance.post(`lottery/`, data, {
-            headers: {
-                "Content-Type": "application/json",
-                accept: "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-        });
+        if (lottery_id) {
+            return await authInstance.put(`lottery/?lottery_id=${lottery_id}`, data, {
+                headers: {
+                    "Content-Type": "application/json",
+                    accept: "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            });
+        } else {
+            return await authInstance.post(`lottery/`, data, {
+                headers: {
+                    "Content-Type": "application/json",
+                    accept: "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            });
+        }
     } catch (e) {
         throw e;
     }
 };
 
-const saveLottery = async (lottery) => {
+const saveLottery = async (lottery, lottery_id) => {
     const now = Date.now();
     const date = new Date();
     const date_created = `${date.getFullYear()}-${
@@ -132,11 +162,13 @@ const saveLottery = async (lottery) => {
             const mime = image.match(
                 /data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/
             );
-            const imgUrl = `lottery/${lottery_name}/lottery_image${now}${mime[1].substring(
-                6
-            )}`;
-            base64Imgs.push({ imageUrl: imgUrl, base64: image });
-            data.image = `${bucketUrl}${imgUrl}`;
+            if (mime) {
+                const imgUrl = `lottery/${lottery_name}/lottery_image${now}.${mime[1].substring(
+                    6
+                )}`;
+                base64Imgs.push({ imageUrl: imgUrl, base64: image });
+                data.image = `${bucketUrl}${imgUrl}`;
+            }
         }
 
         if (lottery_items && lottery_items.length > 0) {
@@ -153,17 +185,29 @@ const saveLottery = async (lottery) => {
                     const mime = image.match(
                         /data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/
                     );
-                    const imgUrl = `lottery/${lottery_name}/${itemName}${now}${mime[1].substring(
-                        6
-                    )}`;
-                    base64Imgs.push({ imageUrl: imgUrl, base64: itemImage });
                     const { item_name, tier } = lottery_items[i];
-                    data.lottery_items.push({
-                        image: `${bucketUrl}${imgUrl}`,
-                        item_name: item_name,
-                        tier: tier,
-                        skins: [],
-                    });
+                    if (mime) {
+                        const imgUrl = `lottery/${lottery_name}/${itemName}${now}.${mime[1].substring(
+                            6
+                        )}`;
+                        base64Imgs.push({
+                            imageUrl: imgUrl,
+                            base64: itemImage,
+                        });
+                        data.lottery_items.push({
+                            image: `${bucketUrl}${imgUrl}`,
+                            item_name: item_name,
+                            tier: tier,
+                            skins: [],
+                        });
+                    } else {
+                        data.lottery_items.push({
+                            image: itemImage,
+                            item_name: item_name,
+                            tier: tier,
+                            skins: [],
+                        });
+                    }
                 }
 
                 if (skins && skins.length > 0) {
@@ -178,17 +222,24 @@ const saveLottery = async (lottery) => {
                             const mime = image.match(
                                 /data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/
                             );
-                            const imgUrl = `lottery/${lottery_name}/${itemName}/${skin_name}${now}${mime[1].substring(
-                                6
-                            )}`;
-                            base64Imgs.push({
-                                imageUrl: imgUrl,
-                                base64: skin_image,
-                            });
-                            data.lottery_items[i].skins.push({
-                                skin_name: skin_name,
-                                skin_image: `${bucketUrl}${imgUrl}`,
-                            });
+                            if (mime) {
+                                const imgUrl = `lottery/${lottery_name}/${itemName}/${skin_name}${now}.${mime[1].substring(
+                                    6
+                                )}`;
+                                base64Imgs.push({
+                                    imageUrl: imgUrl,
+                                    base64: skin_image,
+                                });
+                                data.lottery_items[i].skins.push({
+                                    skin_name: skin_name,
+                                    skin_image: `${bucketUrl}${imgUrl}`,
+                                });
+                            } else {
+                                data.lottery_items[i].skins.push({
+                                    skin_name: skin_name,
+                                    skin_image: skin_image,
+                                });
+                            }
                         }
                     }
                 }
@@ -196,13 +247,23 @@ const saveLottery = async (lottery) => {
         }
 
         await uploadImage(base64Imgs);
-        return await authInstance.post(`lottery/`, data, {
-            headers: {
-                "Content-Type": "application/json",
-                accept: "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-        });
+        if (lottery_id) {
+            return await authInstance.put(`lottery/?lottery_id=${lottery_id}`, data, {
+                headers: {
+                    "Content-Type": "application/json",
+                    accept: "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            });
+        } else {
+            return await authInstance.post(`lottery/`, data, {
+                headers: {
+                    "Content-Type": "application/json",
+                    accept: "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            });
+        }
     } catch (e) {
         throw e;
     }
@@ -256,10 +317,28 @@ const getLottery = async (id) => {
     }
 };
 
+const deleteLottery = async (id) => {
+    try {
+        return await authInstance.delete(
+            `/lottery/${id}`,
+            {},
+            {
+                headers: {
+                    accept: "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            }
+        );
+    } catch (e) {
+        throw e;
+    }
+};
+
 export {
     publishLottery,
     getLotteries,
     saveLottery,
     getLotteryItems,
     getLottery,
+    deleteLottery,
 };

@@ -4,27 +4,23 @@ import Heading2 from "../../components/common/header/Heading2";
 import ImageInput from "../../components/common/input/ImageInput";
 import TextInput from "../../components/common/input/TextInput";
 import { useSelector, useDispatch } from "react-redux";
-import { setLotteryVal } from "../../redux/slice/lotterySlice";
+import { resetLottery, setLotteryVal } from "../../redux/slice/lotterySlice";
 import { Divider, Form, Grid, Header } from "semantic-ui-react";
 import { useNavigate } from "react-router";
-import { useEffect, useState } from "react";
 import "../../assets/css/pages/lottery/CreateLotteryPage.css";
 import CreateLotteryItemCard from "../../components/lottery/card/CreateLotteryItemCard";
-import calcDropRate from "../../functions/calcDropRate";
 import TextButton from "../../components/common/button/TextButton";
 import { publishLottery, saveLottery } from "../../axios/lotteryAPI";
+import { useEffect } from "react";
 
 const CreateLotteryPage = () => {
     const lotteryObj = useSelector((state) => state.lottery);
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [dropRate, setDropRate] = useState([
-        5.0, 8.0, 12.0, 15.0, 18.0, 20.0, 22.0,
-    ]);
 
     useEffect(() => {
-        setDropRate(calcDropRate(lotteryObj.lottery_items));
-    }, [lotteryObj.lottery_items]);
+        if (lotteryObj.id.length > 0) dispatch(resetLottery());
+    }, [dispatch, lotteryObj.id.length]);
 
     return (
         <>
@@ -106,9 +102,7 @@ const CreateLotteryPage = () => {
                                     <CreateLotteryItemCard
                                         index={index}
                                         lotteryObj={lotteryObj}
-                                        dropRate={dropRate}
-                                        dispatch={dispatch}
-                                        navigate={navigate}
+                                        edit={false}
                                     />
                                 ))
                             ) : (
@@ -127,12 +121,10 @@ const CreateLotteryPage = () => {
                             text="Save Lottery"
                             color="#F77F00"
                             onClick={() => {
-                                saveLottery(lotteryObj).then((res) =>
-                                    console
-                                        .log(res)
-                                        .then(() => navigate("/"))
-                                        .catch((e) => console.log(e))
-                                );
+                                saveLottery(lotteryObj)
+                                    .then((res) => console.log(res))
+                                    .then(() => navigate("/"))
+                                    .catch((e) => console.log(e));
                             }}
                         />
                         <div style={{ marginLeft: "0.6rem" }}></div>

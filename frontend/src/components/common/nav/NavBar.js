@@ -63,7 +63,6 @@ const NavBar = ({ currentPage }) => {
 
     useEffect(() => {
         const token = localStorage.getItem("token");
-        console.log(token);
         if (token) {
             setUserEmail(jwtDecode(token).sub);
         } else {

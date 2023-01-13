@@ -109,7 +109,7 @@ async def read_10_lottery_items(id: str):
     return items
 
 
-@router.put("/{id}", response_model=LotteryData)
+@router.put("/", response_model=LotteryData)
 async def update_lottery(lottery_id: str, lottery: NewLottery):
     lottery = jsonable_encoder(lottery)
     items = lottery["lottery_items"]

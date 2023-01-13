@@ -12,3 +12,8 @@ class User_DB_handler(DB_handler):
     def user_exist(self, email: str) -> bool:
         """Validate if user exist."""
         return self.db.users.find_one({'user_email': email}) is not None
+    
+    def get_creator_name(self, user_id: str):
+        """Get the creator name of a lottery."""
+        result = self.collection.find_one({'_id': user_id})
+        return result["user_name"]

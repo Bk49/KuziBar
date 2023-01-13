@@ -8,6 +8,7 @@ const zilliqa = new Zilliqa("https://dev-api.zilliqa.com");
 const ownerAddress = "0x595e6B41b6ee727E48BF3A25e4C42323E26DBCF6";
 
 const buyTicket = async (lotteryId, lotteryPrice, quantity) => {
+    var receipt;
     const isConnect = await window.zilPay.wallet.connect();
     if (isConnect) {
         const deployedContract = window.zilPay.contracts.at(contractAddress);
@@ -29,10 +30,12 @@ const buyTicket = async (lotteryId, lotteryPrice, quantity) => {
                     gasLimit: Long.fromNumber(8000),
                 }
             )
-            .then((receipt) => {
-                console.log(receipt);
+            .then((txReceipt) => {
+                console.log(txReceipt);
+                receipt = txReceipt;
             });
     }
+    //if(receipt.eventlogs[""])
     try {
         const userId = localStorage.getItem("userId");
         if (!userId) throw "userId is not set in the localStorage";
@@ -57,4 +60,23 @@ const buyTicket = async (lotteryId, lotteryPrice, quantity) => {
     }
 };
 
-export { buyTicket };
+const useTicket = async (lotteryId) => {
+    try {
+        const userId = localStorage.getItem("userId");
+        if (!userId) throw new Error("userId is not set in the localStorage");
+        return await authInstance.get(
+            `/ticket/use_ticket?lottery_id=${lotteryId}&user_id=${userId}`,
+            {},
+            {
+                headers: {
+                    accept: "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            }
+        );
+    } catch (e) {
+        throw e;
+    }
+};
+
+export { buyTicket, useTicket };

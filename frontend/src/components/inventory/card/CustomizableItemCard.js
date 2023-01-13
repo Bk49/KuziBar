@@ -10,7 +10,7 @@ const CustomizableItemCard = ({ item, ...rest }) => {
                 <div className="customizable-item-card-creator-container">
                     <div className="customizable-item-card-creator-initial-container">
                         <span className="customizable-item-card-creator-initial-text">
-                            {item.creator_name[0]}
+                            {item.creator_name ? item.creator_name[0] : "No Name"}
                         </span>
                     </div>
                     <span className="customizable-item-card-creator-owner-name">
